@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Lira de Bolso</title>
+  <meta name="description" content="Lira de cordas dedilhadas sintetizada no navegador, com timbre entre orgânico e chiptune e escalas antigas.">
+  <meta name="theme-color" content="#eef0ec" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#13191d" media="(prefers-color-scheme: dark)">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Lira">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=Inter:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Instrumento de cordas · versão 0.1</p>
+    <h1>Lira de Bolso</h1>
+    <p class="lead">Cordas dedilhadas sintetizadas na hora, sem nenhum arquivo de áudio. Toque ou arraste o dedo pelas cordas, ajuste o timbre entre lira orgânica e chiptune e escolha a escala.</p>
+  </header>
+
+  <div class="lyre">
+    <div class="lyre-top">
+      <h2>Cordas</h2>
+      <small id="kbdHint">Arraste para dedilhar várias. No computador: teclas Z a P.</small>
+    </div>
+    <div class="strings" id="strings" tabindex="0" aria-label="Cordas da lira. Toque ou arraste para tocar."></div>
+    <div class="labels" id="labels" aria-hidden="true"></div>
+  </div>
+
+  <div class="grid">
+    <section aria-labelledby="hTimbre">
+      <h2 id="hTimbre">Timbre</h2>
+      <div class="chips" id="presets"></div>
+      <div class="slider">
+        <div class="slider-head"><label for="sChip">Caráter</label><output id="oChip"></output></div>
+        <input type="range" id="sChip" min="0" max="100">
+        <div class="slider-ends"><span>Orgânico</span><span>Chiptune</span></div>
+      </div>
+      <div class="slider">
+        <div class="slider-head"><label for="sBright">Brilho</label><output id="oBright"></output></div>
+        <input type="range" id="sBright" min="0" max="100">
+        <div class="slider-ends"><span>Abafado</span><span>Metálico</span></div>
+      </div>
+      <div class="slider">
+        <div class="slider-head"><label for="sSustain">Sustentação</label><output id="oSustain"></output></div>
+        <input type="range" id="sSustain" min="0" max="100">
+        <div class="slider-ends"><span>Curta</span><span>Longa</span></div>
+      </div>
+      <div class="slider">
+        <div class="slider-head"><label for="sEcho">Eco</label><output id="oEcho"></output></div>
+        <input type="range" id="sEcho" min="0" max="100">
+        <div class="slider-ends"><span>Seco</span><span>Salão de pedra</span></div>
+      </div>
+    </section>
+
+    <section aria-labelledby="hScale">
+      <h2 id="hScale">Escala</h2>
+      <div class="chips" id="modes"></div>
+      <p class="mode-desc" id="modeDesc"></p>
+
+      <h2>Música contínua</h2>
+      <div class="btns">
+        <button class="btn primary" type="button" id="btnMusic">Tocar música</button>
+      </div>
+      <p class="note">Melodia gerada na hora, sempre diferente, com baixo nas cordas graves. Mude o timbre ou a escala enquanto toca.</p>
+    </section>
+  </div>
+
+  <p class="note" id="summary"></p>
+</div>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
