@@ -4,6 +4,7 @@
 // Recordings keep note numbers, so they replay with whatever timbre is chosen.
 
 import { $, store, state, audio, now, play, onPluck, setMode, MODES } from './core.js';
+import { renderRecording, shareOrDownload } from './export.js';
 
 const L = {
   layers: [],        // { notes: [{ t, midi, vel }], muted }
@@ -116,16 +117,47 @@ function load(rec) {
   if (rec.mode && MODES[rec.mode]) setMode(rec.mode);
   render();
 }
-function saved() { return store.get('loops', []); }
-function saveCurrent() {
+export function saved() { return store.get('loops', []); }
+
+// Saving asks for a name first (prefilled), then opens the saved list so the result is visible.
+function askName() {
   if (!L.loopLen) return;
+  $('loopName').value = `Gravação ${saved().length + 1}`;
+  $('loopNameForm').hidden = false;
+  $('loopName').focus();
+  $('loopName').select();
+}
+function saveCurrent(name) {
   const list = saved();
-  const n = list.length + 1;
-  list.unshift({ name: `Gravação ${n}`, at: new Date().toISOString(), ...snapshot() });
+  list.unshift({ name: name.trim() || `Gravação ${list.length + 1}`, at: new Date().toISOString(), ...snapshot() });
   store.set('loops', list.slice(0, 30));
+  $('loopNameForm').hidden = true;
+  $('savedBox').open = true;
   render();
-  $('loopSave').textContent = 'Salva';
-  setTimeout(() => { $('loopSave').textContent = 'Salvar gravação'; }, 1400);
+  flashMsg(`"${list[0].name}" salva em Gravações salvas.`);
+}
+let msgTimer = null;
+function flashMsg(text) {
+  $('loopMsg').textContent = text;
+  $('loopMsg').hidden = false;
+  clearTimeout(msgTimer);
+  msgTimer = setTimeout(() => { $('loopMsg').hidden = true; }, 3500);
+}
+
+// Audio file: rendered from the recording, then shared (phones) or downloaded.
+async function exportAudio(rec, btn) {
+  const label = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Gerando áudio…';
+  try {
+    const blob = await renderRecording(rec);
+    const r = await shareOrDownload(blob, rec.name || 'Gravação');
+    flashMsg(r === 'shared' ? 'Áudio compartilhado.' : r === 'downloaded' ? 'Áudio baixado (arquivo .wav).' : 'Compartilhamento cancelado.');
+  } catch (e) {
+    flashMsg('Não foi possível gerar o áudio neste navegador.');
+  }
+  btn.disabled = false;
+  btn.textContent = label;
 }
 
 // ---- UI ----
@@ -140,6 +172,7 @@ function render() {
   $('loopUndo').disabled = !has || rec;
   $('loopClear').disabled = !L.layers.length || rec;
   $('loopSave').disabled = !has || rec;
+  $('loopExport').disabled = !has || rec;
   $('loopStatus').textContent = rec
     ? (has ? 'Gravando uma volta do loop por cima das camadas anteriores…' : 'Gravando… toque as cordas e aperte "Parar" para fechar o loop.')
     : has ? `Loop de ${fmt(L.loopLen)} · ${L.layers.length} ${L.layers.length === 1 ? 'camada' : 'camadas'}${L.layers.length >= MAX_LAYERS ? ' (máximo)' : ''}`
@@ -169,14 +202,30 @@ function render() {
     li.querySelector('small').textContent = `${when} · ${fmt(r.loopLen)} · ${r.layers.length} ${r.layers.length === 1 ? 'camada' : 'camadas'}`;
     const open = document.createElement('button');
     open.type = 'button'; open.className = 'btn'; open.textContent = 'Abrir';
-    open.addEventListener('click', () => load(r));
+    open.addEventListener('click', () => { load(r); flashMsg(`"${r.name}" aberta. Aperte "Tocar" para ouvir.`); });
+    const ren = document.createElement('button');
+    ren.type = 'button'; ren.className = 'btn'; ren.textContent = 'Renomear';
+    ren.addEventListener('click', () => {
+      const input = document.createElement('input');
+      input.type = 'text'; input.value = r.name; input.className = 'name-input'; input.maxLength = 40;
+      input.setAttribute('aria-label', 'Novo nome');
+      const b = li.querySelector('b');
+      b.replaceWith(input);
+      input.focus(); input.select();
+      const done = () => { const l = saved(); if (l[i]) { l[i].name = input.value.trim() || r.name; store.set('loops', l); } render(); };
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') done(); if (e.key === 'Escape') render(); });
+      input.addEventListener('blur', done);
+    });
+    const dl = document.createElement('button');
+    dl.type = 'button'; dl.className = 'btn'; dl.textContent = 'Baixar áudio';
+    dl.addEventListener('click', () => exportAudio(r, dl));
     const del = document.createElement('button');
     del.type = 'button'; del.className = 'btn'; del.textContent = 'Apagar';
     del.addEventListener('click', () => {
       if (!del.dataset.armed) { del.dataset.armed = '1'; del.textContent = 'Confirmar'; return; }
       const l = saved(); l.splice(i, 1); store.set('loops', l); render();
     });
-    li.append(open, del);
+    li.append(open, ren, dl, del);
     sl.appendChild(li);
   });
   drawBar();
@@ -199,7 +248,10 @@ $('loopClear').addEventListener('click', () => {
   autosave();
   render();
 });
-$('loopSave').addEventListener('click', saveCurrent);
+$('loopSave').addEventListener('click', askName);
+$('loopNameForm').addEventListener('submit', e => { e.preventDefault(); saveCurrent($('loopName').value); });
+$('loopNameCancel').addEventListener('click', () => { $('loopNameForm').hidden = true; });
+$('loopExport').addEventListener('click', () => exportAudio({ name: 'Gravação atual', ...snapshot() }, $('loopExport')));
 
 // restore the loop from the last session (not playing until asked)
 const cur = store.get('loop-current', null);
@@ -208,5 +260,8 @@ if (cur && cur.loopLen && Array.isArray(cur.layers)) {
   L.loopLen = cur.loopLen;
 }
 
-export function initLooper() { render(); }
+export function initLooper() {
+  if (saved().length) $('savedBox').open = true;
+  render();
+}
 export function stopLooper() { if (L.rec) stopRecording(); }

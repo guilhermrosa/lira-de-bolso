@@ -95,3 +95,12 @@ input[type=range] { width: 100%; accent-color: var(--aegean); }
 .saved-row span { flex: 1 1 160px; display: grid; min-width: 0; }
 .saved-row small { color: var(--muted); font-size: 12px; }
 .saved-row .btn { padding: 9px 12px; font-size: 13px; }
+
+/* naming and messages */
+.name-form { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.name-form label { flex: 1 1 100%; font-size: 13px; color: var(--muted); }
+.name-form input, .name-input { flex: 1 1 180px; min-width: 0; font: 500 15px/1.2 var(--body); padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.name-form input:focus-visible, .name-input:focus-visible { outline: 2px solid var(--aegean); outline-offset: 1px; }
+.msg { margin: 0; padding: 8px 12px; border-radius: 10px; background: color-mix(in srgb, var(--aegean) 14%, transparent); color: var(--ink); font-size: 13.5px; }
+.saved summary { font-weight: 600; color: var(--ink); }
+.sub { margin: 4px 0 0; font: 400 16px/1.2 var(--display); }

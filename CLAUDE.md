@@ -18,6 +18,7 @@ Standalone synthesized lyre, shipped as a PWA on GitHub Pages from `main` (root)
   - Relaxar (`js/relax.js`): calm generative music with a 10/20/30/60 min timer that fades out over the last minute.
   - Aprender (`js/learn.js`): memory game, phrases grow one note per round; best round in `lira-learn-best`.
   - Canções (`js/songs.js`): public-domain melodies (Brilha Brilha Estrelinha, Ode à Alegria, Frère Jacques, Mary Had a Little Lamb) to listen to or play along (next string lit). They switch the scale to Jônio (maior), added to `MODES` in lyre.js for this.
+- v0.3: saving asks for a name (renamable later), shows a message and opens the saved list; "Baixar áudio" renders a recording offline (`js/export.js`, OfflineAudioContext with the recording's own timbre, ~20 s / at least 2 turns, mono 16-bit WAV) and shares it through the share sheet when the device can share files, otherwise downloads it. Saved recordings also appear under "Suas gravações" in Canções (layers merged in time order, in the recording's own scale).
 - Games that wait for the player stop when their tab is left; relax music and loop playback keep going.
 
 ## Open questions

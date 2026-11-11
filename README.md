@@ -7,10 +7,10 @@ Lira de cordas dedilhadas sintetizada no navegador, sem nenhum arquivo de áudio
 ## O que dá para fazer
 
 - **Tocar:** 15 cordas, de Ré grave a Ré agudo. Toque uma ou arraste o dedo para dedilhar várias; no computador, as teclas Z a P também tocam. Ajuste o timbre (presets e controles de caráter, brilho, sustentação e eco) e escolha a escala (Dórico, Frígio, Mixolídio, Pentatônica ou Jônio).
-- **Gravar em camadas:** grave uma melodia para criar um loop e grave novas camadas por cima, ouvindo as anteriores. Dá para silenciar camadas, desfazer, limpar e salvar gravações no aparelho.
+- **Gravar em camadas:** grave uma melodia para criar um loop e grave novas camadas por cima, ouvindo as anteriores. Dá para silenciar camadas, desfazer, limpar, salvar gravações com nome no aparelho e **baixar como arquivo de áudio** (no celular, abre o compartilhar, para mandar pelo WhatsApp, por exemplo).
 - **Relaxar:** música calma gerada na hora, com timer que diminui o volume no último minuto.
 - **Aprender:** jogo de memória musical; a frase cresce uma nota a cada acerto.
-- **Canções:** melodias de domínio público para ouvir ou tocar junto, com a próxima corda acesa.
+- **Canções:** melodias de domínio público e as suas gravações salvas, para ouvir ou tocar junto, com a próxima corda acesa.
 
 Os ajustes e as gravações ficam salvos no aparelho.
 
@@ -37,6 +37,7 @@ Cada nota é uma corda simulada pelo algoritmo Karplus–Strong: um ruído curto
 | `js/relax.js` | Modo relaxamento com timer |
 | `js/learn.js` | Jogo de memória |
 | `js/songs.js` | Canções para ouvir e tocar junto |
+| `js/export.js` | Gera o arquivo de áudio de uma gravação |
 | `js/lyre.js` | Motor de som (compartilhado com o repositório `corredor-invertido`) |
 | `sw.js` | Service worker (offline) |
 | `manifest.webmanifest` | Dados do app instalável |

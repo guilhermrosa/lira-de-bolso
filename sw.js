@@ -1,6 +1,6 @@
 // Service worker: makes the lyre load and play offline.
 // Bump VERSION on every release so installed copies pick up the new files.
-const VERSION = 'lira-v0.2.1';
+const VERSION = 'lira-v0.3.0';
 const SHELL = [
   './',
   'index.html',
@@ -11,6 +11,7 @@ const SHELL = [
   'js/relax.js',
   'js/learn.js',
   'js/songs.js',
+  'js/export.js',
   'js/lyre.js',
   'manifest.webmanifest',
   'icons/icon-192.png',

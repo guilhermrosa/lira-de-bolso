@@ -21,7 +21,7 @@
 <body>
 <div class="wrap">
   <header>
-    <p class="eyebrow">Instrumento de cordas · versão 0.2.1</p>
+    <p class="eyebrow">Instrumento de cordas · versão 0.3</p>
     <h1>Lira de Bolso</h1>
     <p class="lead">Cordas dedilhadas sintetizadas na hora, sem nenhum arquivo de áudio. Toque ou arraste o dedo pelas cordas. Grave em camadas, relaxe com música contínua, treine a memória ou toque canções.</p>
   </header>
@@ -55,9 +55,17 @@
         <button class="btn" type="button" id="loopUndo">Desfazer camada</button>
         <button class="btn" type="button" id="loopClear">Limpar</button>
         <button class="btn" type="button" id="loopSave">Salvar gravação</button>
+        <button class="btn" type="button" id="loopExport">Baixar áudio</button>
       </div>
+      <form class="name-form" id="loopNameForm" hidden>
+        <label for="loopName">Nome da gravação</label>
+        <input type="text" id="loopName" maxlength="40" autocomplete="off">
+        <button class="btn primary" type="submit">Salvar</button>
+        <button class="btn" type="button" id="loopNameCancel">Cancelar</button>
+      </form>
+      <p class="msg" id="loopMsg" hidden role="status"></p>
       <ul class="layers" id="loopLayers" aria-label="Camadas (toque para silenciar)"></ul>
-      <details class="saved">
+      <details class="saved" id="savedBox">
         <summary>Gravações salvas</summary>
         <ul id="loopSaved"></ul>
       </details>
@@ -122,6 +130,9 @@
     <section>
       <h2>Canções</h2>
       <div class="chips" id="songList"></div>
+      <h3 class="sub">Suas gravações</h3>
+      <div class="chips" id="mySongs"></div>
+      <p class="note" id="mySongsEmpty">As gravações que você salvar em "Tocar" aparecem aqui para ouvir ou tocar junto.</p>
       <p class="note" id="songFrom"></p>
       <div class="btns">
         <button class="btn" type="button" id="songListen">Ouvir</button>

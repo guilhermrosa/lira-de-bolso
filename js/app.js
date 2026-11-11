@@ -5,7 +5,7 @@ import { $, state, audio, applyTimbre, saveSettings, buildStrings, setMode, onMo
 import { initLooper, stopLooper } from './looper.js';
 import { initRelax } from './relax.js';
 import { initLearn, stopLearn } from './learn.js';
-import { initSongs, stopSongs } from './songs.js';
+import { initSongs, stopSongs, refreshSongs } from './songs.js';
 
 // ---- timbre and scale ----
 const presetsEl = $('presets'), modesEl = $('modes');
@@ -70,6 +70,7 @@ function showTab(name) {
   // games that wait for the player stop when you leave their tab; music and loops keep playing
   if (name !== 'aprender') stopLearn();
   if (name !== 'cancoes') stopSongs();
+  else refreshSongs();
   if (name !== 'tocar') stopLooper();
   if (location.hash.slice(1) !== name) history.replaceState(null, '', '#' + name);
 }

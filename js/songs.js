@@ -1,11 +1,13 @@
-// Songs: public-domain melodies to listen to or play along with.
+// Songs: public-domain melodies, plus your own saved recordings, to listen to or play along with.
 // "Tocar junto" lights the next string and waits for it; "Ouvir" plays the melody.
-// Melodies are written as [string index, beats] on the Ionian (major) layout from Ré 3:
+// Built-in melodies are written as [string index, beats] on the Ionian (major) layout from Ré 3:
 // index 7 = Ré 4 (the tonic), 8 = Mi, 9 = Fá♯, 10 = Sol, 11 = Lá, 12 = Si, 4 = Lá 3.
 
-import { $, state, audio, phrase, onPluck, guide, setMode } from './core.js';
+import { $, ROOT, store, state, audio, phrase, onPluck, guide, setMode, MODES } from './core.js';
+import { scaleNotes } from './lyre.js';
 
 const q = (...xs) => xs.map(x => (Array.isArray(x) ? x : [x, 1]));
+const BEAT = 0.55; // seconds per beat for the built-in melodies
 
 export const SONGS = [
   {
@@ -32,28 +34,47 @@ export const SONGS = [
   },
 ];
 
-let song = 0, mode = 'idle', pos = 0; // idle | listen | along
+// Everything playable as one shape: { key, name, from, mode, seq: [[midi, seconds until next]] }
+function builtIn() {
+  const strings = scaleNotes(ROOT, 'jonio');
+  return SONGS.map((s, i) => ({
+    key: 'b' + i, name: s.name, from: s.from, mode: 'jonio',
+    seq: s.notes.map(([idx, beats]) => [strings[idx], beats * BEAT]),
+  }));
+}
+// A saved recording becomes one melody: all its layers merged in time order, one turn of the loop.
+function fromRecordings() {
+  return store.get('loops', []).map((r, i) => {
+    const notes = r.layers.filter(l => !l.muted).flatMap(l => l.notes).sort((a, b) => a.t - b.t);
+    const seq = notes.map((n, k) => [n.midi, (k + 1 < notes.length ? notes[k + 1].t : r.loopLen) - n.t]);
+    return { key: 'r' + i, name: r.name, from: `Sua gravação · escala ${MODES[r.mode]?.name || ''}`, mode: MODES[r.mode] ? r.mode : 'dorico', seq };
+  }).filter(s => s.seq.length);
+}
+
+let list = [], current = null, mode = 'idle', pos = 0; // idle | listen | along
 let cancel = () => {};
-const BEAT = 0.55; // seconds per beat when listening
 
 function stopAll() { cancel(); cancel = () => {}; guide([]); }
 
-function ensureMajor() {
-  if (state.modeKey !== 'jonio') {
-    setMode('jonio');
+function ensureMode(m) {
+  if (state.modeKey !== m) {
+    setMode(m);
+    $('songNote').textContent = `Esta melodia usa a escala ${MODES[m].name}; a escala foi trocada. Você pode mudá-la de volta em "Tocar".`;
     $('songNote').hidden = false;
   }
 }
+const indexOf = midi => state.notes.indexOf(midi);
 
 function listen() {
-  if (!audio()) return;
+  if (!audio() || !current) return;
   stopAll();
-  ensureMajor();
+  ensureMode(current.mode);
   mode = 'listen';
   let t = 0.2;
-  const items = SONGS[song].notes.map(([i, beats]) => {
-    const it = { t, midi: state.notes[i], vel: 0.5, onStart: () => guide([i]) };
-    t += beats * BEAT;
+  const items = current.seq.map(([midi, secs]) => {
+    const i = indexOf(midi);
+    const it = { t, midi, vel: 0.5, onStart: () => guide(i >= 0 ? [i] : []) };
+    t += Math.max(0.08, secs);
     return it;
   });
   cancel = phrase(items, () => { guide([]); mode = 'idle'; render('Fim. Que tal tocar junto?'); });
@@ -61,52 +82,64 @@ function listen() {
 }
 
 function along() {
-  if (!audio()) return;
+  if (!audio() || !current) return;
   stopAll();
-  ensureMajor();
+  ensureMode(current.mode);
   mode = 'along';
   pos = 0;
-  guide([SONGS[song].notes[0][0]]);
+  guide([indexOf(current.seq[0][0])]);
   render(progressText());
 }
 
-const progressText = () => `Toque a corda acesa · nota ${pos + 1} de ${SONGS[song].notes.length}`;
+const progressText = () => `Toque a corda acesa · nota ${pos + 1} de ${current.seq.length}`;
 
 onPluck(i => {
   if (mode !== 'along') return;
-  const notes = SONGS[song].notes;
-  if (i !== notes[pos][0]) { render('Essa não: toque a corda acesa.'); return; }
+  if (i !== indexOf(current.seq[pos][0])) { render('Essa não: toque a corda acesa.'); return; }
   pos++;
-  if (pos >= notes.length) {
+  if (pos >= current.seq.length) {
     mode = 'idle';
     guide([]);
-    render(`Muito bem! Você tocou "${SONGS[song].name}" inteira.`);
+    render(`Muito bem! Você tocou "${current.name}" inteira.`);
     return;
   }
-  guide([notes[pos][0]]);
+  guide([indexOf(current.seq[pos][0])]);
   render(progressText());
 });
 
 function render(msg) {
   if (msg) $('songStatus').textContent = msg;
-  document.querySelectorAll('[data-song]').forEach(b => b.setAttribute('aria-pressed', +b.dataset.song === song));
-  $('songFrom').textContent = SONGS[song].from;
+  document.querySelectorAll('[data-song]').forEach(b => b.setAttribute('aria-pressed', current && b.dataset.song === current.key));
+  $('songFrom').textContent = current ? current.from : '';
+}
+
+function chip(s) {
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'chip';
+  b.dataset.song = s.key;
+  b.textContent = s.name;
+  b.addEventListener('click', () => { current = s; stopAll(); mode = 'idle'; render('Escolha ouvir ou tocar junto.'); });
+  return b;
+}
+
+// Rebuilds the lists; called on start and whenever the tab opens (recordings may have changed).
+export function refreshSongs() {
+  const mine = fromRecordings();
+  list = [...builtIn(), ...mine];
+  if (!current || !list.some(s => s.key === current.key && s.name === current.name)) current = list[0];
+  else current = list.find(s => s.key === current.key);
+  $('songList').replaceChildren(...list.filter(s => s.key[0] === 'b').map(chip));
+  $('mySongs').replaceChildren(...mine.map(chip));
+  $('mySongsEmpty').hidden = mine.length > 0;
+  render();
 }
 
 export function initSongs() {
-  const box = $('songList');
-  SONGS.forEach((s, i) => {
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'chip';
-    b.dataset.song = i;
-    b.textContent = s.name;
-    b.addEventListener('click', () => { song = i; stopAll(); mode = 'idle'; render('Escolha ouvir ou tocar junto.'); });
-    box.appendChild(b);
-  });
   $('songListen').addEventListener('click', listen);
   $('songAlong').addEventListener('click', along);
-  render('Escolha uma canção. "Ouvir" toca a melodia; "Tocar junto" acende a próxima corda e espera você.');
+  refreshSongs();
+  render('Escolha uma melodia. "Ouvir" toca; "Tocar junto" acende a próxima corda e espera você.');
 }
 
 export function stopSongs() {
