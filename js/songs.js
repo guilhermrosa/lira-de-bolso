@@ -3,7 +3,7 @@
 // Melodies are written as [string index, beats] on the Ionian (major) layout from Ré 3:
 // index 7 = Ré 4 (the tonic), 8 = Mi, 9 = Fá♯, 10 = Sol, 11 = Lá, 12 = Si, 4 = Lá 3.
 
-import { $, state, audio, now, play, onPluck, guide, setMode } from './core.js';
+import { $, state, audio, phrase, onPluck, guide, setMode } from './core.js';
 
 const q = (...xs) => xs.map(x => (Array.isArray(x) ? x : [x, 1]));
 
@@ -33,11 +33,10 @@ export const SONGS = [
 ];
 
 let song = 0, mode = 'idle', pos = 0; // idle | listen | along
-let timers = [];
+let cancel = () => {};
 const BEAT = 0.55; // seconds per beat when listening
 
-function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
-function stopAll() { timers.forEach(clearTimeout); timers = []; guide([]); }
+function stopAll() { cancel(); cancel = () => {}; guide([]); }
 
 function ensureMajor() {
   if (state.modeKey !== 'jonio') {
@@ -51,15 +50,13 @@ function listen() {
   stopAll();
   ensureMajor();
   mode = 'listen';
-  let t = 0.3;
-  const t0 = now();
-  for (const [i, beats] of SONGS[song].notes) {
-    const at = t;
-    play(state.notes[i], t0 + at, 0.5);
-    later(() => guide([i]), at * 1000);
+  let t = 0.2;
+  const items = SONGS[song].notes.map(([i, beats]) => {
+    const it = { t, midi: state.notes[i], vel: 0.5, onStart: () => guide([i]) };
     t += beats * BEAT;
-  }
-  later(() => { guide([]); mode = 'idle'; render('Fim. Que tal tocar junto?'); }, t * 1000 + 200);
+    return it;
+  });
+  cancel = phrase(items, () => { guide([]); mode = 'idle'; render('Fim. Que tal tocar junto?'); });
   render('Ouvindo… as cordas acendem conforme a melodia.');
 }
 

@@ -68,6 +68,34 @@ export function play(midi, when = 0, vel = 0.5, opt = {}) {
   if (si >= 0) setTimeout(() => flash(si), Math.max(0, (t - ac.currentTime) * 1000));
   return t;
 }
+// Play a phrase: items [{ t, midi, vel, onStart }] with t in seconds from now.
+// Notes are handed to the audio engine at most 0.25 s ahead, so cancel() silences the rest
+// of the phrase at once (scheduling everything up front could not be taken back).
+export function phrase(items, onEnd) {
+  if (!audio()) return () => {};
+  const t0 = ac.currentTime + 0.1;
+  const queue = items.slice().sort((a, b) => a.t - b.t);
+  let k = 0;
+  const timers = new Set();
+  const later = (fn, ms) => { const id = setTimeout(() => { timers.delete(id); fn(); }, ms); timers.add(id); };
+  const tick = () => {
+    const horizon = ac.currentTime + 0.25;
+    while (k < queue.length && t0 + queue[k].t < horizon) {
+      const it = queue[k++];
+      play(it.midi, t0 + it.t, it.vel ?? 0.5);
+      if (it.onStart) later(it.onStart, Math.max(0, (t0 + it.t - ac.currentTime) * 1000));
+    }
+    if (k >= queue.length) {
+      clearInterval(iv);
+      const end = queue.length ? t0 + queue[queue.length - 1].t : ac.currentTime;
+      if (onEnd) later(onEnd, Math.max(0, (end - ac.currentTime) * 1000) + 400);
+    }
+  };
+  const iv = setInterval(tick, 40);
+  tick();
+  return () => { clearInterval(iv); timers.forEach(clearTimeout); timers.clear(); };
+}
+
 export function strum(list, gapMs, vel) {
   if (!audio()) return;
   const t0 = ac.currentTime + 0.01;
