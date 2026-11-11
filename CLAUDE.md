@@ -7,7 +7,7 @@ Standalone synthesized lyre, shipped as a PWA on GitHub Pages from `main` (root)
 - `js/lyre.js` is shared with the `guilhermrosa/corredor-invertido` game. Keep both copies identical; change one, copy to the other.
 - When adding or renaming a file the app loads, add it to `SHELL` in `sw.js`.
 - On every release, bump `VERSION` in `sw.js` and the version label in `index.html`.
-- UI text is in Brazilian Portuguese. Light and dark themes both come from the tokens in `css/style.css`.
+- UI text is in Brazilian Portuguese. Visual identity (v0.4): "Cerâmica de figuras negras", one look whatever the device theme; tokens at the top of `css/style.css`. Black text on the terracotta ground must stay at 4.5:1 or more.
 - Test with a local server (`python3 -m http.server`); modules do not load from `file://`.
 
 ## Structure (v0.2)
@@ -23,5 +23,5 @@ Standalone synthesized lyre, shipped as a PWA on GitHub Pages from `main` (root)
 
 ## Open questions
 
-- Visual identity: the user finds the app (dark on their device) without a defined look yet; to be designed later.
+- Visual identity chosen (v0.4): direction 2 of 3. The other two (Mármore e Egeu, Noite no templo) are kept in `docs/direcoes-visuais.md` for later (idea: light and dark themes).
 - "Lira de Bolso" is a working name; check for existing apps with the same name before a public launch.

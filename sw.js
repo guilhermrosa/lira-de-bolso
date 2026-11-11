@@ -1,6 +1,6 @@
 // Service worker: makes the lyre load and play offline.
 // Bump VERSION on every release so installed copies pick up the new files.
-const VERSION = 'lira-v0.3.1';
+const VERSION = 'lira-v0.4.0';
 const SHELL = [
   './',
   'index.html',

@@ -1,14 +1,14 @@
-"""Generate the placeholder app icons (lyre frame with bronze strings on Aegean blue).
+"""Generate the app icons: a black-figure lyre with cream strings on terracotta.
 
 Run from the repository root:  python3 tools/make_icons.py
 Requires Pillow.
 """
 from PIL import Image, ImageDraw
 
-BG = (47, 108, 140)      # Aegean blue
-FRAME = (238, 240, 236)  # marble
-STRING = (214, 178, 108) # bronze
-PLUCK = (214, 84, 74)    # one plucked string
+BG = (208, 108, 66)      # terracotta
+FRAME = (27, 21, 18)     # black figure
+STRING = (241, 223, 189) # cream
+PLUCK = (246, 239, 224)  # one plucked string
 
 
 def lyre(size, inset):

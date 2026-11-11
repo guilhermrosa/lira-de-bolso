@@ -30,7 +30,8 @@ Cada nota é uma corda simulada pelo algoritmo Karplus–Strong: um ruído curto
 | Arquivo | O que faz |
 | --- | --- |
 | `index.html` | Página |
-| `css/style.css` | Estilo (claro e escuro) |
+| `css/style.css` | Estilo (identidade "Cerâmica de figuras negras") |
+| `docs/direcoes-visuais.md` | As três direções visuais desenhadas, com cores e fontes |
 | `js/app.js` | Abas, controles de timbre e escala |
 | `js/core.js` | Som, cordas na tela e ajustes salvos |
 | `js/looper.js` | Gravação em camadas |
