@@ -77,7 +77,6 @@ function showTab(name) {
 for (const t of TABS) $('tab-' + t).addEventListener('click', () => showTab(t));
 addEventListener('hashchange', () => showTab(location.hash.slice(1)));
 
-if (matchMedia('(hover: none)').matches) $('kbdHint').textContent = 'Arraste o dedo para dedilhar várias cordas.';
 buildStrings();
 syncUI();
 initLooper();

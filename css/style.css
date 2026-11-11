@@ -104,3 +104,4 @@ input[type=range] { width: 100%; accent-color: var(--aegean); }
 .msg { margin: 0; padding: 8px 12px; border-radius: 10px; background: color-mix(in srgb, var(--aegean) 14%, transparent); color: var(--ink); font-size: 13.5px; }
 .saved summary { font-weight: 600; color: var(--ink); }
 .sub { margin: 4px 0 0; font: 400 16px/1.2 var(--display); }
+.labels kbd { display: block; margin-top: 2px; font: 600 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--muted); opacity: .8; }

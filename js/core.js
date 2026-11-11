@@ -121,10 +121,16 @@ export function buildStrings() {
     stringsEl.appendChild(d);
     const l = document.createElement('span');
     l.textContent = NOTE_NAMES[m % 12];
+    if (showKeys && keyLabel(i)) {
+      const k = document.createElement('kbd');
+      k.textContent = keyLabel(i);
+      l.appendChild(k);
+    }
     if (m % 12 === ROOT % 12) l.className = 'root';
     labelsEl.appendChild(l);
     return d;
   });
+  keyHint();
 }
 export function setMode(key) {
   if (!MODES[key] || key === state.modeKey) return;
@@ -176,11 +182,22 @@ stringsEl.addEventListener('pointermove', e => {
 const stop = () => { dragging = false; lastIdx = -1; };
 stringsEl.addEventListener('pointerup', stop);
 stringsEl.addEventListener('pointercancel', stop);
-const KEYS = 'zxcvbnmasdfghjklqwertyuiop';
+// Keyboard: physical key positions (e.code), so it works the same on any keyboard layout.
+// Strings run along the bottom letter row (Z…M), then the middle row (A…L).
+const KEY_CODES = ['KeyZ', 'KeyX', 'KeyC', 'KeyV', 'KeyB', 'KeyN', 'KeyM', 'KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyK', 'KeyL'];
+export const keyLabel = i => (KEY_CODES[i] || '').replace('Key', '');
+const showKeys = matchMedia('(hover: hover) and (pointer: fine)').matches;
+function keyHint() {
+  const el = $('kbdHint');
+  if (!el) return;
+  if (!showKeys) { el.textContent = 'Arraste o dedo para dedilhar várias cordas.'; return; }
+  const n = state.notes.length;
+  el.textContent = `Arraste para dedilhar várias. No teclado: ${keyLabel(0)} a ${keyLabel(Math.min(6, n - 1))}, depois ${keyLabel(7)} a ${keyLabel(n - 1)} (a letra de cada corda aparece embaixo dela).`;
+}
 addEventListener('keydown', e => {
   if (e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
   if (e.target instanceof HTMLInputElement) return;
-  const i = KEYS.indexOf(e.key.toLowerCase());
+  const i = KEY_CODES.indexOf(e.code);
   if (i >= 0 && i < state.notes.length) { userPluck(i, 0.55); e.preventDefault(); }
 });
 
