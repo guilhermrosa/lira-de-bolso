@@ -66,3 +66,32 @@ input[type=range] { width: 100%; accent-color: var(--aegean); }
 .btn.primary { background: var(--aegean); border-color: var(--aegean); color: var(--surface); }
 .note { margin: 0; font-size: 12.5px; color: var(--muted); }
 @media (prefers-reduced-motion: reduce) { .str.on::before { animation: none; } }
+
+/* tabs */
+.tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 4px; }
+.tab { font: 600 13.5px/1 var(--body); padding: 11px 6px; border: 0; border-radius: 9px; background: transparent; color: var(--muted); cursor: pointer; }
+.tab[aria-selected="true"] { background: var(--aegean); color: var(--surface); }
+.tab:focus-visible { outline: 2px solid var(--aegean); outline-offset: 2px; }
+.panel { display: grid; gap: 22px; }
+.status { margin: 0; font-size: 15px; min-height: 1.5em; }
+.btn.big { padding: 16px 22px; font-size: 16px; }
+.btn:disabled { opacity: .45; cursor: default; }
+
+/* strings lit as a guide (learn, songs) */
+.str.guide::before { background: var(--aegean); box-shadow: 0 0 0 3px color-mix(in srgb, var(--aegean) 30%, transparent); }
+
+/* recording */
+.rec { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+.rec-head { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.rec-head h2 { flex: 0 0 auto; }
+.loop-bar { flex: 1 1 120px; height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.loop-bar i { display: block; height: 100%; width: calc(var(--p, 0) * 100%); background: var(--aegean); }
+.btn.recording { background: var(--pluck); border-color: var(--pluck); color: var(--surface); }
+.layers { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.layers .chip[aria-pressed="false"] { opacity: .55; }
+.saved summary { cursor: pointer; font-size: 13.5px; color: var(--muted); }
+.saved ul { display: grid; gap: 8px; margin: 10px 0 0; padding: 0; list-style: none; }
+.saved-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.saved-row span { flex: 1 1 160px; display: grid; min-width: 0; }
+.saved-row small { color: var(--muted); font-size: 12px; }
+.saved-row .btn { padding: 9px 12px; font-size: 13px; }

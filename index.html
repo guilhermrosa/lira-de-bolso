@@ -21,9 +21,9 @@
 <body>
 <div class="wrap">
   <header>
-    <p class="eyebrow">Instrumento de cordas · versão 0.1.1</p>
+    <p class="eyebrow">Instrumento de cordas · versão 0.2</p>
     <h1>Lira de Bolso</h1>
-    <p class="lead">Cordas dedilhadas sintetizadas na hora, sem nenhum arquivo de áudio. Toque ou arraste o dedo pelas cordas, ajuste o timbre entre lira orgânica e chiptune e escolha a escala.</p>
+    <p class="lead">Cordas dedilhadas sintetizadas na hora, sem nenhum arquivo de áudio. Toque ou arraste o dedo pelas cordas. Grave em camadas, relaxe com música contínua, treine a memória ou toque canções.</p>
   </header>
 
   <div class="lyre">
@@ -35,46 +35,102 @@
     <div class="labels" id="labels" aria-hidden="true"></div>
   </div>
 
-  <div class="grid">
-    <section aria-labelledby="hTimbre">
-      <h2 id="hTimbre">Timbre</h2>
-      <div class="chips" id="presets"></div>
-      <div class="slider">
-        <div class="slider-head"><label for="sChip">Caráter</label><output id="oChip"></output></div>
-        <input type="range" id="sChip" min="0" max="100">
-        <div class="slider-ends"><span>Orgânico</span><span>Chiptune</span></div>
+  <nav class="tabs" role="tablist" aria-label="Modos">
+    <button class="tab" id="tab-tocar" role="tab" type="button" aria-controls="panel-tocar">Tocar</button>
+    <button class="tab" id="tab-relaxar" role="tab" type="button" aria-controls="panel-relaxar">Relaxar</button>
+    <button class="tab" id="tab-aprender" role="tab" type="button" aria-controls="panel-aprender">Aprender</button>
+    <button class="tab" id="tab-cancoes" role="tab" type="button" aria-controls="panel-cancoes">Canções</button>
+  </nav>
+
+  <div class="panel" id="panel-tocar" role="tabpanel" aria-labelledby="tab-tocar">
+    <section class="rec" aria-labelledby="hRec">
+      <div class="rec-head">
+        <h2 id="hRec">Gravação em camadas</h2>
+        <div class="loop-bar" id="loopBar" aria-hidden="true"><i></i></div>
       </div>
-      <div class="slider">
-        <div class="slider-head"><label for="sBright">Brilho</label><output id="oBright"></output></div>
-        <input type="range" id="sBright" min="0" max="100">
-        <div class="slider-ends"><span>Abafado</span><span>Metálico</span></div>
+      <p class="note" id="loopStatus"></p>
+      <div class="btns">
+        <button class="btn primary" type="button" id="loopRec">Gravar</button>
+        <button class="btn" type="button" id="loopPlay">Tocar</button>
+        <button class="btn" type="button" id="loopUndo">Desfazer camada</button>
+        <button class="btn" type="button" id="loopClear">Limpar</button>
+        <button class="btn" type="button" id="loopSave">Salvar gravação</button>
       </div>
-      <div class="slider">
-        <div class="slider-head"><label for="sSustain">Sustentação</label><output id="oSustain"></output></div>
-        <input type="range" id="sSustain" min="0" max="100">
-        <div class="slider-ends"><span>Curta</span><span>Longa</span></div>
-      </div>
-      <div class="slider">
-        <div class="slider-head"><label for="sEcho">Eco</label><output id="oEcho"></output></div>
-        <input type="range" id="sEcho" min="0" max="100">
-        <div class="slider-ends"><span>Seco</span><span>Salão de pedra</span></div>
-      </div>
+      <ul class="layers" id="loopLayers" aria-label="Camadas (toque para silenciar)"></ul>
+      <details class="saved">
+        <summary>Gravações salvas</summary>
+        <ul id="loopSaved"></ul>
+      </details>
     </section>
 
-    <section aria-labelledby="hScale">
-      <h2 id="hScale">Escala</h2>
-      <div class="chips" id="modes"></div>
-      <p class="mode-desc" id="modeDesc"></p>
+    <div class="grid">
+      <section aria-labelledby="hTimbre">
+        <h2 id="hTimbre">Timbre</h2>
+        <div class="chips" id="presets"></div>
+        <div class="slider">
+          <div class="slider-head"><label for="sChip">Caráter</label><output id="oChip"></output></div>
+          <input type="range" id="sChip" min="0" max="100">
+          <div class="slider-ends"><span>Orgânico</span><span>Chiptune</span></div>
+        </div>
+        <div class="slider">
+          <div class="slider-head"><label for="sBright">Brilho</label><output id="oBright"></output></div>
+          <input type="range" id="sBright" min="0" max="100">
+          <div class="slider-ends"><span>Abafado</span><span>Metálico</span></div>
+        </div>
+        <div class="slider">
+          <div class="slider-head"><label for="sSustain">Sustentação</label><output id="oSustain"></output></div>
+          <input type="range" id="sSustain" min="0" max="100">
+          <div class="slider-ends"><span>Curta</span><span>Longa</span></div>
+        </div>
+        <div class="slider">
+          <div class="slider-head"><label for="sEcho">Eco</label><output id="oEcho"></output></div>
+          <input type="range" id="sEcho" min="0" max="100">
+          <div class="slider-ends"><span>Seco</span><span>Salão de pedra</span></div>
+        </div>
+      </section>
 
-      <h2>Música contínua</h2>
-      <div class="btns">
-        <button class="btn primary" type="button" id="btnMusic">Tocar música</button>
-      </div>
-      <p class="note">Melodia gerada na hora, sempre diferente, com baixo nas cordas graves. Mude o timbre ou a escala enquanto toca.</p>
+      <section aria-labelledby="hScale">
+        <h2 id="hScale">Escala</h2>
+        <div class="chips" id="modes"></div>
+        <p class="mode-desc" id="modeDesc"></p>
+      </section>
+    </div>
+    <p class="note" id="summary"></p>
+  </div>
+
+  <div class="panel" id="panel-relaxar" role="tabpanel" aria-labelledby="tab-relaxar" hidden>
+    <section>
+      <h2>Relaxar</h2>
+      <p class="note">Uma melodia calma e sempre diferente, no timbre e na escala escolhidos em "Tocar". Com timer, o volume diminui aos poucos no último minuto.</p>
+      <div class="chips" id="relaxTimers" aria-label="Duração"></div>
+      <div class="btns"><button class="btn primary big" type="button" id="relaxBtn">Começar</button></div>
+      <p class="status" id="relaxLeft" aria-live="polite"></p>
+      <p class="note">No celular, a música pode parar se a tela bloquear; deixe o app aberto.</p>
     </section>
   </div>
 
-  <p class="note" id="summary"></p>
+  <div class="panel" id="panel-aprender" role="tabpanel" aria-labelledby="tab-aprender" hidden>
+    <section>
+      <h2>Aprender: jogo de memória</h2>
+      <p class="status" id="learnStatus" aria-live="polite"></p>
+      <div class="btns"><button class="btn primary big" type="button" id="learnBtn">Começar</button></div>
+      <p class="note" id="learnBest"></p>
+    </section>
+  </div>
+
+  <div class="panel" id="panel-cancoes" role="tabpanel" aria-labelledby="tab-cancoes" hidden>
+    <section>
+      <h2>Canções</h2>
+      <div class="chips" id="songList"></div>
+      <p class="note" id="songFrom"></p>
+      <div class="btns">
+        <button class="btn" type="button" id="songListen">Ouvir</button>
+        <button class="btn primary" type="button" id="songAlong">Tocar junto</button>
+      </div>
+      <p class="status" id="songStatus" aria-live="polite"></p>
+      <p class="note" id="songNote" hidden>As canções usam a escala Jônio (maior); a escala foi trocada. Você pode mudá-la de volta em "Tocar".</p>
+    </section>
+  </div>
 </div>
 <script type="module" src="js/app.js"></script>
 </body>

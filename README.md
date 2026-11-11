@@ -6,12 +6,13 @@ Lira de cordas dedilhadas sintetizada no navegador, sem nenhum arquivo de áudio
 
 ## O que dá para fazer
 
-- **Tocar as cordas:** 15 cordas, de Ré grave a Ré agudo. Toque uma, ou arraste o dedo para dedilhar várias. No computador, as teclas Z a P também tocam.
-- **Ajustar o timbre:** presets Ruína, Lira, Lira 8-bit, Harpa clara e Chip puro, mais os controles Caráter (orgânico ↔ chiptune), Brilho, Sustentação e Eco.
-- **Escolher a escala:** Dórico, Frígio, Mixolídio ou Pentatônica.
-- **Música contínua:** melodia gerada na hora, sempre diferente.
+- **Tocar:** 15 cordas, de Ré grave a Ré agudo. Toque uma ou arraste o dedo para dedilhar várias; no computador, as teclas Z a P também tocam. Ajuste o timbre (presets e controles de caráter, brilho, sustentação e eco) e escolha a escala (Dórico, Frígio, Mixolídio, Pentatônica ou Jônio).
+- **Gravar em camadas:** grave uma melodia para criar um loop e grave novas camadas por cima, ouvindo as anteriores. Dá para silenciar camadas, desfazer, limpar e salvar gravações no aparelho.
+- **Relaxar:** música calma gerada na hora, com timer que diminui o volume no último minuto.
+- **Aprender:** jogo de memória musical; a frase cresce uma nota a cada acerto.
+- **Canções:** melodias de domínio público para ouvir ou tocar junto, com a próxima corda acesa.
 
-Os ajustes ficam salvos no aparelho.
+Os ajustes e as gravações ficam salvos no aparelho.
 
 ## Instalar como app
 
@@ -30,7 +31,12 @@ Cada nota é uma corda simulada pelo algoritmo Karplus–Strong: um ruído curto
 | --- | --- |
 | `index.html` | Página |
 | `css/style.css` | Estilo (claro e escuro) |
-| `js/app.js` | Cordas, controles, música e ajustes salvos |
+| `js/app.js` | Abas, controles de timbre e escala |
+| `js/core.js` | Som, cordas na tela e ajustes salvos |
+| `js/looper.js` | Gravação em camadas |
+| `js/relax.js` | Modo relaxamento com timer |
+| `js/learn.js` | Jogo de memória |
+| `js/songs.js` | Canções para ouvir e tocar junto |
 | `js/lyre.js` | Motor de som (compartilhado com o repositório `corredor-invertido`) |
 | `sw.js` | Service worker (offline) |
 | `manifest.webmanifest` | Dados do app instalável |
