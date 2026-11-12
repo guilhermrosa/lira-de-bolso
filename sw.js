@@ -15,6 +15,7 @@ const SHELL = [
   'js/songs.js',
   'js/export.js',
   'js/lyre.js',
+  'js/songbook.js',
   'js/version.js',
   'manifest.webmanifest',
   'icons/icon-192.png',

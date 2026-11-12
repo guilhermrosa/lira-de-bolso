@@ -1,45 +1,15 @@
 // Songs: public-domain melodies, plus your own saved recordings, to listen to or play along with.
 // "Tocar junto" lights the next string and waits for it; "Ouvir" plays the melody.
-// Built-in melodies are written as [string index, beats] on the Ionian (major) layout from Ré 3:
-// index 7 = Ré 4 (the tonic), 8 = Mi, 9 = Fá♯, 10 = Sol, 11 = Lá, 12 = Si, 4 = Lá 3.
+// Built-in melodies live in songbook.js (note names, scale and tempo per melody).
 
-import { $, ROOT, store, state, audio, phrase, onPluck, guide, setMode, MODES } from './core.js';
-import { scaleNotes } from './lyre.js';
-
-const q = (...xs) => xs.map(x => (Array.isArray(x) ? x : [x, 1]));
-const BEAT = 0.55; // seconds per beat for the built-in melodies
-
-export const SONGS = [
-  {
-    name: 'Brilha, Brilha, Estrelinha', from: 'Melodia tradicional francesa',
-    notes: q(7, 7, 11, 11, 12, 12, [11, 2], 10, 10, 9, 9, 8, 8, [7, 2],
-      11, 11, 10, 10, 9, 9, [8, 2], 11, 11, 10, 10, 9, 9, [8, 2],
-      7, 7, 11, 11, 12, 12, [11, 2], 10, 10, 9, 9, 8, 8, [7, 2]),
-  },
-  {
-    name: 'Ode à Alegria', from: 'Beethoven, 9ª Sinfonia',
-    notes: q(9, 9, 10, 11, 11, 10, 9, 8, 7, 7, 8, 9, [9, 1.5], [8, 0.5], [8, 2],
-      9, 9, 10, 11, 11, 10, 9, 8, 7, 7, 8, 9, [8, 1.5], [7, 0.5], [7, 2]),
-  },
-  {
-    name: 'Frère Jacques', from: 'Cânone tradicional francês',
-    notes: q(7, 8, 9, 7, 7, 8, 9, 7, 9, 10, [11, 2], 9, 10, [11, 2],
-      [11, 0.5], [12, 0.5], [11, 0.5], [10, 0.5], 9, 7, [11, 0.5], [12, 0.5], [11, 0.5], [10, 0.5], 9, 7,
-      7, 4, [7, 2], 7, 4, [7, 2]),
-  },
-  {
-    name: 'Mary Had a Little Lamb', from: 'Canção infantil tradicional',
-    notes: q(9, 8, 7, 8, 9, 9, [9, 2], 8, 8, [8, 2], 9, 11, [11, 2],
-      9, 8, 7, 8, 9, 9, 9, 9, 8, 8, 9, 8, [7, 4]),
-  },
-];
+import { $, store, state, audio, phrase, onPluck, guide, setMode, MODES } from './core.js';
+import { SONGBOOK, parseMelody } from './songbook.js';
 
 // Everything playable as one shape: { key, name, from, mode, seq: [[midi, seconds until next]] }
 function builtIn() {
-  const strings = scaleNotes(ROOT, 'jonio');
-  return SONGS.map((s, i) => ({
-    key: 'b' + i, name: s.name, from: s.from, mode: 'jonio',
-    seq: s.notes.map(([idx, beats]) => [strings[idx], beats * BEAT]),
+  return SONGBOOK.map((s, i) => ({
+    key: 'b' + i, name: s.name, from: s.from, mode: s.mode,
+    seq: parseMelody(s.mel).map(([midi, beats]) => [midi, beats * s.beat]),
   }));
 }
 // A saved recording becomes one melody: all its layers merged in time order, one turn of the loop.
