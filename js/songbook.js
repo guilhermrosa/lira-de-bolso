@@ -86,7 +86,7 @@ export const SONGBOOK = [
           B4:.5 D5:.5 C#5:.5 B4:.5 A4:.5 G4:.5 F#4:.5 E4:.5 D4:2`,
   },
   {
-    name: 'Sapo Jururu', from: 'Cantiga de ninar brasileira', mode: 'jonio', beat: 0.65,
+    name: 'Sapo Cururu', from: 'Cantiga de ninar brasileira', mode: 'jonio', beat: 0.65,
     mel: `A3:.75 B3:.25 A3:.5 F#3:.5 D4:2 A3:.5 B3:.5 A3:.5 F#3:.5 D4:2
           F#4:.5 F#4:.5 E4:.5 F#4:.5 G4:.25 E4:.25 C#4:.5 A3:.5 A3:.5 B3:.5 B3:.5 A3:.5 G3:.5 F#3:2`,
   },
