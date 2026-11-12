@@ -1,3 +1,7 @@
+/* Fonts are served with the app (latin subset, SIL Open Font License, see fonts/OFL-*.txt), so no
+   request ever goes to Google and the first visit already works offline. */
+@font-face { font-family: 'Cinzel'; font-style: normal; font-weight: 600 700; font-display: swap; src: url('../fonts/cinzel-latin.woff2') format('woff2'); }
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 400 600; font-display: swap; src: url('../fonts/inter-latin.woff2') format('woff2'); }
 /* Visual identity v0.4: "Cerâmica de figuras negras" (black-figure Greek pottery).
    Terracotta ground, black forms, cream accents, a meander band, the lyre drawn as a black
    vase silhouette. One deliberate look whatever the device theme.
@@ -112,3 +116,5 @@ input[type=range] { width: 100%; accent-color: var(--black); }
 @media (prefers-reduced-motion: reduce) { .str.on::before { animation: none; } }
 .song-groups { display: grid; gap: 10px; }
 .song-groups h3.sub:first-child { margin-top: 0; }
+.foot { text-align: center; font-size: 13px; }
+.foot a { color: var(--black); font-weight: 600; }

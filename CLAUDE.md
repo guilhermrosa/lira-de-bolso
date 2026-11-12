@@ -7,6 +7,7 @@ Standalone synthesized lyre, shipped as a PWA on GitHub Pages from `main` (root)
 - `js/lyre.js` is shared with the `guilhermrosa/corredor-invertido` game. Keep both copies identical; change one, copy to the other.
 - When adding or renaming a file the app loads, add it to `SHELL` in `sw.js`.
 - On every release, bump `APP_VERSION` in `js/version.js`, the only copy of the version: the header label (`index.html`) and the service worker cache name (`sw.js` imports it) both read it.
+- Privacy (v0.38 / v0.6.2, user request): nothing leaves the device, so no consent screen is needed. Fonts are served from `fonts/` (latin subset woff2, OFL licences alongside) instead of Google Fonts, so the app contacts no other site (the service worker only handles same-origin requests). `privacidade.html` explains this in plain pt-BR (what stays on the device, how to delete it, hosting by GitHub Pages, no permissions); it is linked from the footer and is the privacy policy URL a store listing will need. Keep it true when adding features that store or send anything (e.g. the planned microphone/audio-file feature).
 - UI text is in Brazilian Portuguese. Visual identity (v0.4): "Cerâmica de figuras negras", one look whatever the device theme; tokens at the top of `css/style.css`. Black text on the terracotta ground must stay at 4.5:1 or more.
 - Test with a local server (`python3 -m http.server`); modules do not load from `file://`.
 
