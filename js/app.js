@@ -94,7 +94,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
     if (hadController && !reloaded) { reloaded = true; location.reload(); }
   });
   addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').then(reg => {
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(reg => {
       document.addEventListener('visibilitychange', () => { if (!document.hidden) reg.update().catch(() => {}); });
     }).catch(() => {});
   });

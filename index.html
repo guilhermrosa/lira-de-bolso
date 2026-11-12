@@ -16,11 +16,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="css/style.css">
+  <script src="js/version.js"></script>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <p class="eyebrow">Instrumento de cordas · versão 0.4</p>
+    <p class="eyebrow">Instrumento de cordas · <span id="verLabel">versão</span><script>document.getElementById('verLabel').textContent = 'versão ' + self.APP_VERSION;</script></p>
     <h1>Lira de Bolso</h1>
     <p class="lead">Cordas dedilhadas sintetizadas na hora, sem nenhum arquivo de áudio. Toque ou arraste o dedo pelas cordas. Grave em camadas, relaxe com música contínua, treine a memória ou toque canções.</p>
   </header>
