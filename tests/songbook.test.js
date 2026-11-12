@@ -2,7 +2,7 @@
 // (from Ré 3), and every name unique.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { SONGBOOK, parseMelody } from '../js/songbook.js';
+import { SONGBOOK, GROUPS, parseMelody } from '../js/songbook.js';
 import { scaleNotes, MODES, NOTE_NAMES } from '../js/lyre.js';
 
 const ROOT = 50; // Ré 3, as in core.js
@@ -10,6 +10,7 @@ const ROOT = 50; // Ré 3, as in core.js
 for (const song of SONGBOOK) {
   test(song.name, () => {
     assert.ok(MODES[song.mode], 'unknown scale ' + song.mode);
+    assert.ok(GROUPS.some(g => g.key === song.group), 'unknown group ' + song.group);
     assert.ok(song.beat > 0.2 && song.beat < 1.5, 'odd tempo');
     const strings = scaleNotes(ROOT, song.mode);
     const notes = parseMelody(song.mel);

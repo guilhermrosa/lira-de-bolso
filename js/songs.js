@@ -3,12 +3,12 @@
 // Built-in melodies live in songbook.js (note names, scale and tempo per melody).
 
 import { $, store, state, audio, phrase, onPluck, guide, setMode, MODES } from './core.js';
-import { SONGBOOK, parseMelody } from './songbook.js';
+import { SONGBOOK, GROUPS, parseMelody } from './songbook.js';
 
 // Everything playable as one shape: { key, name, from, mode, seq: [[midi, seconds until next]] }
 function builtIn() {
   return SONGBOOK.map((s, i) => ({
-    key: 'b' + i, name: s.name, from: s.from, mode: s.mode,
+    key: 'b' + i, name: s.name, from: s.from, mode: s.mode, group: s.group,
     seq: parseMelody(s.mel).map(([midi, beats]) => [midi, beats * s.beat]),
   }));
 }
@@ -99,7 +99,17 @@ export function refreshSongs() {
   list = [...builtIn(), ...mine];
   if (!current || !list.some(s => s.key === current.key && s.name === current.name)) current = list[0];
   else current = list.find(s => s.key === current.key);
-  $('songList').replaceChildren(...list.filter(s => s.key[0] === 'b').map(chip));
+  $('songList').replaceChildren(...GROUPS.flatMap(g => {
+    const songs = list.filter(s => s.key[0] === 'b' && s.group === g.key);
+    if (!songs.length) return [];
+    const h = document.createElement('h3');
+    h.className = 'sub';
+    h.textContent = g.name;
+    const box = document.createElement('div');
+    box.className = 'chips';
+    box.append(...songs.map(chip));
+    return [h, box];
+  }));
   $('mySongs').replaceChildren(...mine.map(chip));
   $('mySongsEmpty').hidden = mine.length > 0;
   render();

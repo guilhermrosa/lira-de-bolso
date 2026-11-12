@@ -110,3 +110,5 @@ input[type=range] { width: 100%; accent-color: var(--black); }
 .msg { margin: 0; padding: 9px 12px; border-radius: 10px; background: var(--black); color: var(--cream); font-size: 13.5px; }
 
 @media (prefers-reduced-motion: reduce) { .str.on::before { animation: none; } }
+.song-groups { display: grid; gap: 10px; }
+.song-groups h3.sub:first-child { margin-top: 0; }
