@@ -1,4 +1,4 @@
-// Lira de Bolso: entry point. Tabs (Tocar, Relaxar, Aprender, Canções), timbre and scale
+// Lira de Bolso: entry point. Tabs (Tocar, Relaxar, Memória, Canções), timbre and scale
 // controls, and offline support. The strings and audio live in core.js.
 
 import { $, state, audio, applyTimbre, saveSettings, buildStrings, setMode, onModeChange, play, strum, MODES, PRESETS } from './core.js';
@@ -60,15 +60,16 @@ modesEl.addEventListener('click', e => {
 onModeChange(syncUI);
 
 // ---- tabs ----
-const TABS = ['tocar', 'relaxar', 'aprender', 'cancoes'];
+const TABS = ['tocar', 'relaxar', 'memoria', 'cancoes'];
 function showTab(name) {
+  if (name === 'aprender') name = 'memoria'; // the tab's name before v0.6.1
   if (!TABS.includes(name)) name = 'tocar';
   for (const t of TABS) {
     $('tab-' + t).setAttribute('aria-selected', t === name);
     $('panel-' + t).hidden = t !== name;
   }
   // games that wait for the player stop when you leave their tab; music and loops keep playing
-  if (name !== 'aprender') stopLearn();
+  if (name !== 'memoria') stopLearn();
   if (name !== 'cancoes') stopSongs();
   else refreshSongs();
   if (name !== 'tocar') stopLooper();

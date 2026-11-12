@@ -13,10 +13,10 @@ Standalone synthesized lyre, shipped as a PWA on GitHub Pages from `main` (root)
 ## Structure (v0.2)
 
 - `js/core.js`: audio, strings on screen (`onPluck`, `guide`, `flash`), timbre/scale state and saved settings. Every tab builds on it.
-- Tabs in `js/app.js` (hash-routed: #tocar, #relaxar, #aprender, #cancoes):
+- Tabs in `js/app.js` (hash-routed: #tocar, #relaxar, #memoria, #cancoes; the old #aprender still opens Memória):
   - Tocar: timbre and scale, plus recording in layers (`js/looper.js`): the first recording sets the loop length; each new layer records one full turn over the others. Up to 8 layers, mute per layer, undo, clear, saved recordings (`lira-loops`, current loop in `lira-loop-current`). Recordings store MIDI notes, so they replay in the current timbre; the scale is restored on open.
   - Relaxar (`js/relax.js`): calm generative music with a 10/20/30/60 min timer that fades out over the last minute.
-  - Aprender (`js/learn.js`): memory game, phrases grow one note per round; best round in `lira-learn-best`.
+  - Memória (`js/learn.js`; named Aprender until v0.6.1, renamed because it trains memory rather than teaching, at the user's request): memory game, phrases grow one note per round; best round in `lira-learn-best`.
   - Canções (`js/songs.js`): public-domain melodies to listen to or play along (next string lit); each switches the scale to its own (Jônio was added to `MODES` in lyre.js for this). Melodies live in `js/songbook.js` as note names ("F#4:.5", beats), each with a group, scale and tempo; every note must be on the 15 strings of its scale (Ré 3 to Ré 5), which `npm test` checks (tests/songbook.test.js, Node 22+, no dependencies). `tools/abc2lyre.py` converts ABC notation and picks the scale/transposition that fits. v0.6 (user asked for fewer children's songs and groups): 23 melodies in 4 groups:
     - Antigas e medievais: Epitáfio de Seikilos (consensus transcription read from the score in an IMEKO 2016 paper, an octave down), Scarborough Fair (familiar tune, Dórico), Greensleeves (Dórico, leading note not raised), Rosa das Rosas (Cantiga 10, Ali Corbin's ABC; two passing B♭ played as B).
     - Clássicas: Ode à Alegria, Minueto em Sol (Petzold, long attributed to Bach; A part), Cânone em Ré (Pachelbel, violin theme simplified), Gymnopédie nº 1 (Satie, opening melody), Canção de Ninar (Brahms, 1927 songbook ABC).

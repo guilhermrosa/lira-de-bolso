@@ -9,7 +9,7 @@ Lira de cordas dedilhadas sintetizada no navegador, sem nenhum arquivo de áudio
 - **Tocar:** 15 cordas, de Ré grave a Ré agudo. Toque uma ou arraste o dedo para dedilhar várias; no computador, as teclas Z a P também tocam. Ajuste o timbre (presets e controles de caráter, brilho, sustentação e eco) e escolha a escala (Dórico, Frígio, Mixolídio, Pentatônica ou Jônio).
 - **Gravar em camadas:** grave uma melodia para criar um loop e grave novas camadas por cima, ouvindo as anteriores. Dá para silenciar camadas, desfazer, limpar, salvar gravações com nome no aparelho e **baixar como arquivo de áudio** (no celular, abre o compartilhar, para mandar pelo WhatsApp, por exemplo).
 - **Relaxar:** música calma gerada na hora, com timer que diminui o volume no último minuto.
-- **Aprender:** jogo de memória musical; a frase cresce uma nota a cada acerto.
+- **Memória:** jogo de memória musical; a frase cresce uma nota a cada acerto.
 - **Canções:** melodias de domínio público e as suas gravações salvas, para ouvir ou tocar junto, com a próxima corda acesa.
 
 Os ajustes e as gravações ficam salvos no aparelho.
