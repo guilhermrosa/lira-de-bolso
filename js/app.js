@@ -1,7 +1,7 @@
 // Lira de Bolso: entry point. Tabs (Tocar, Relaxar, Memória, Canções), timbre and scale
 // controls, and offline support. The strings and audio live in core.js.
 
-import { t, LANGS, lang, setLang, translatePage } from './i18n.js';
+import { t, LANGS, FLAGS, lang, setLang, translatePage } from './i18n.js';
 import { $, store, state, audio, applyTimbre, saveSettings, buildStrings, setMode, onModeChange, play, strum, MODES, PRESETS } from './core.js';
 import { initLooper, stopLooper } from './looper.js';
 import { initHum, stopHum } from './hum.js';
@@ -14,7 +14,7 @@ translatePage();
 $('verLabel').textContent = t('head.eyebrow', { v: self.APP_VERSION });
 for (const [k, name] of Object.entries(LANGS)) {
   const b = document.createElement('button');
-  b.className = 'chip'; b.type = 'button'; b.lang = k; b.textContent = name;
+  b.className = 'chip flag-chip'; b.type = 'button'; b.lang = k; b.innerHTML = FLAGS[k]; b.append(name);
   b.setAttribute('aria-pressed', k === lang);
   b.addEventListener('click', () => setLang(k));
   $('langs').appendChild(b);

@@ -154,6 +154,8 @@ label.btn.disabled { opacity: .45; pointer-events: none; }
 .settings { border: 2px solid var(--black); border-radius: 18px; padding: 18px; background: var(--clay); color: var(--black); max-width: min(420px, calc(100vw - 32px)); }
 .settings::backdrop { background: rgba(0, 0, 0, .35); }
 .settings form { display: grid; gap: 14px; }
+.flag-chip { display: inline-flex; align-items: center; gap: 8px; }
+.flag-chip svg { width: 21px; height: 14px; border-radius: 2px; box-shadow: 0 0 0 1px rgba(0, 0, 0, .25); flex: 0 0 auto; }
 .theme-chips { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .theme-chip { display: grid; gap: 8px; padding: 10px; border-radius: 14px; border: 2px solid var(--black); background: transparent; color: var(--black); font: 600 13.5px/1.2 var(--body); cursor: pointer; text-align: left; }
 .theme-chip[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--accent) inset; }
