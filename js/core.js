@@ -1,7 +1,8 @@
 // Shared core of the app: audio, the strings on screen, the chosen timbre and scale.
 // Every tab (play, relax, learn, songs) builds on this module.
 
-import { createLyre, scaleNotes, NOTE_NAMES, MODES, PRESETS } from './lyre.js';
+import { createLyre, scaleNotes, MODES, PRESETS } from './lyre.js';
+import { t, noteName } from './i18n.js';
 
 export const $ = id => document.getElementById(id);
 export const ROOT = 50; // Ré 3
@@ -120,7 +121,7 @@ export function buildStrings() {
     d.style.setProperty('--w', (3.2 - 2 * i / (state.notes.length - 1)).toFixed(2) + 'px');
     stringsEl.appendChild(d);
     const l = document.createElement('span');
-    l.textContent = NOTE_NAMES[m % 12];
+    l.textContent = noteName(m);
     if (showKeys && keyLabel(i)) {
       const k = document.createElement('kbd');
       k.textContent = keyLabel(i);
@@ -190,9 +191,9 @@ const showKeys = matchMedia('(hover: hover) and (pointer: fine)').matches;
 function keyHint() {
   const el = $('kbdHint');
   if (!el) return;
-  if (!showKeys) { el.textContent = 'Arraste o dedo para dedilhar várias cordas.'; return; }
+  if (!showKeys) { el.textContent = t('lyre.hintTouch'); return; }
   const n = state.notes.length;
-  el.textContent = `Arraste para dedilhar várias. No teclado: ${keyLabel(0)} a ${keyLabel(Math.min(6, n - 1))}, depois ${keyLabel(7)} a ${keyLabel(n - 1)} (a letra de cada corda aparece embaixo dela).`;
+  el.textContent = t('lyre.hintKeys', { a: keyLabel(0), b: keyLabel(Math.min(6, n - 1)), c: keyLabel(7), d: keyLabel(n - 1) });
 }
 addEventListener('keydown', e => {
   if (e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;

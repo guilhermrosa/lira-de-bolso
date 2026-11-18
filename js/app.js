@@ -1,6 +1,7 @@
 // Lira de Bolso: entry point. Tabs (Tocar, Relaxar, Memória, Canções), timbre and scale
 // controls, and offline support. The strings and audio live in core.js.
 
+import { t, LANGS, lang, setLang, translatePage } from './i18n.js';
 import { $, store, state, audio, applyTimbre, saveSettings, buildStrings, setMode, onModeChange, play, strum, MODES, PRESETS } from './core.js';
 import { initLooper, stopLooper } from './looper.js';
 import { initHum, stopHum } from './hum.js';
@@ -8,16 +9,27 @@ import { initRelax } from './relax.js';
 import { initLearn, stopLearn } from './learn.js';
 import { initSongs, stopSongs, refreshSongs } from './songs.js';
 
+// ---- language (v0.10): static texts first, before anything renders ----
+translatePage();
+$('verLabel').textContent = t('head.eyebrow', { v: self.APP_VERSION });
+for (const [k, name] of Object.entries(LANGS)) {
+  const b = document.createElement('button');
+  b.className = 'chip'; b.type = 'button'; b.lang = k; b.textContent = name;
+  b.setAttribute('aria-pressed', k === lang);
+  b.addEventListener('click', () => setLang(k));
+  $('langs').appendChild(b);
+}
+
 // ---- timbre and scale ----
 const presetsEl = $('presets'), modesEl = $('modes');
 for (const [key, p] of Object.entries(PRESETS)) {
   const b = document.createElement('button');
-  b.className = 'chip'; b.type = 'button'; b.dataset.preset = key; b.textContent = p.name;
+  b.className = 'chip'; b.type = 'button'; b.dataset.preset = key; b.textContent = t('preset.' + key);
   presetsEl.appendChild(b);
 }
 for (const [key, m] of Object.entries(MODES)) {
   const b = document.createElement('button');
-  b.className = 'chip'; b.type = 'button'; b.dataset.mode = key; b.textContent = m.name;
+  b.className = 'chip'; b.type = 'button'; b.dataset.mode = key; b.textContent = t('mode.' + key);
   modesEl.appendChild(b);
 }
 const sliders = { chip: $('sChip'), bright: $('sBright'), sustain: $('sSustain'), echo: $('sEcho') };
@@ -28,9 +40,9 @@ function syncUI() {
   for (const k in sliders) { sliders[k].value = P[k]; outs[k].textContent = P[k]; }
   presetsEl.querySelectorAll('[data-preset]').forEach(b => b.setAttribute('aria-pressed', b.dataset.preset === state.presetKey));
   modesEl.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === state.modeKey));
-  $('modeDesc').textContent = MODES[state.modeKey].desc;
-  const pName = state.presetKey ? PRESETS[state.presetKey].name : 'Personalizado';
-  $('summary').textContent = `${pName} · ${MODES[state.modeKey].name} · Caráter ${P.chip} · Brilho ${P.bright} · Sustentação ${P.sustain} · Eco ${P.echo}`;
+  $('modeDesc').textContent = t('modeDesc.' + state.modeKey);
+  const pName = state.presetKey ? t('preset.' + state.presetKey) : t('timbre.custom');
+  $('summary').textContent = t('summary', { preset: pName, mode: t('mode.' + state.modeKey), chip: P.chip, bright: P.bright, sustain: P.sustain, echo: P.echo });
 }
 for (const k in sliders) {
   sliders[k].addEventListener('input', () => {

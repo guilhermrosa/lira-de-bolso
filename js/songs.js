@@ -2,13 +2,14 @@
 // "Tocar junto" lights the next string and waits for it; "Ouvir" plays the melody.
 // Built-in melodies live in songbook.js (note names, scale and tempo per melody).
 
+import { t, songText } from './i18n.js';
 import { $, store, state, audio, phrase, onPluck, guide, setMode, MODES } from './core.js';
 import { SONGBOOK, GROUPS, parseMelody } from './songbook.js';
 
 // Everything playable as one shape: { key, name, from, mode, seq: [[midi, seconds until next]] }
 function builtIn() {
   return SONGBOOK.map((s, i) => ({
-    key: 'b' + i, name: s.name, from: s.from, mode: s.mode, group: s.group,
+    key: 'b' + i, ...songText(s), mode: s.mode, group: s.group,
     seq: parseMelody(s.mel).map(([midi, beats]) => [midi, beats * s.beat]),
   }));
 }
@@ -17,7 +18,7 @@ function fromRecordings() {
   return store.get('loops', []).map((r, i) => {
     const notes = r.layers.filter(l => !l.muted).flatMap(l => l.notes).sort((a, b) => a.t - b.t);
     const seq = notes.map((n, k) => [n.midi, (k + 1 < notes.length ? notes[k + 1].t : r.loopLen) - n.t]);
-    return { key: 'r' + i, name: r.name, from: `Sua gravação · escala ${MODES[r.mode]?.name || ''}`, mode: MODES[r.mode] ? r.mode : 'dorico', seq };
+    return { key: 'r' + i, name: r.name, from: t('songs.fromMine', { mode: MODES[r.mode] ? t('mode.' + r.mode) : '' }), mode: MODES[r.mode] ? r.mode : 'dorico', seq };
   }).filter(s => s.seq.length);
 }
 
@@ -29,7 +30,7 @@ function stopAll() { cancel(); cancel = () => {}; guide([]); }
 function ensureMode(m) {
   if (state.modeKey !== m) {
     setMode(m);
-    $('songNote').textContent = `Esta melodia usa a escala ${MODES[m].name}; a escala foi trocada. Você pode mudá-la de volta em "Tocar".`;
+    $('songNote').textContent = t('songs.modeChanged', { mode: t('mode.' + m) });
     $('songNote').hidden = false;
   }
 }
@@ -47,8 +48,8 @@ function listen() {
     t += Math.max(0.08, secs);
     return it;
   });
-  cancel = phrase(items, () => { guide([]); mode = 'idle'; render('Fim. Que tal tocar junto?'); });
-  render('Ouvindo… as cordas acendem conforme a melodia.');
+  cancel = phrase(items, () => { guide([]); mode = 'idle'; render(t('songs.end')); });
+  render(t('songs.listening'));
 }
 
 function along() {
@@ -61,16 +62,16 @@ function along() {
   render(progressText());
 }
 
-const progressText = () => `Toque a corda acesa · nota ${pos + 1} de ${current.seq.length}`;
+const progressText = () => t('songs.progress', { i: pos + 1, n: current.seq.length });
 
 onPluck(i => {
   if (mode !== 'along') return;
-  if (i !== indexOf(current.seq[pos][0])) { render('Essa não: toque a corda acesa.'); return; }
+  if (i !== indexOf(current.seq[pos][0])) { render(t('songs.notThat')); return; }
   pos++;
   if (pos >= current.seq.length) {
     mode = 'idle';
     guide([]);
-    render(`Muito bem! Você tocou "${current.name}" inteira.`);
+    render(t('songs.done', { name: current.name }));
     return;
   }
   guide([indexOf(current.seq[pos][0])]);
@@ -89,7 +90,7 @@ function chip(s) {
   b.className = 'chip';
   b.dataset.song = s.key;
   b.textContent = s.name;
-  b.addEventListener('click', () => { current = s; stopAll(); mode = 'idle'; render('Escolha ouvir ou tocar junto.'); });
+  b.addEventListener('click', () => { current = s; stopAll(); mode = 'idle'; render(t('songs.pick')); });
   return b;
 }
 
@@ -104,7 +105,7 @@ export function refreshSongs() {
     if (!songs.length) return [];
     const h = document.createElement('h3');
     h.className = 'sub';
-    h.textContent = g.name;
+    h.textContent = t('group.' + g.key);
     const box = document.createElement('div');
     box.className = 'chips';
     box.append(...songs.map(chip));
@@ -119,7 +120,7 @@ export function initSongs() {
   $('songListen').addEventListener('click', listen);
   $('songAlong').addEventListener('click', along);
   refreshSongs();
-  render('Escolha uma melodia. "Ouvir" toca; "Tocar junto" acende a próxima corda e espera você.');
+  render(t('songs.intro'));
 }
 
 export function stopSongs() {

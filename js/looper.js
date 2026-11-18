@@ -3,6 +3,7 @@
 // full turn of the loop while the earlier layers keep playing, then stops by itself.
 // Recordings keep note numbers, so they replay with whatever timbre is chosen.
 
+import { t, LOCALE, lang } from './i18n.js';
 import { $, store, state, audio, now, play, onPluck, setMode, MODES } from './core.js';
 import { renderRecording, shareOrDownload } from './export.js';
 
@@ -17,7 +18,7 @@ const L = {
 };
 
 const MAX_LAYERS = 8;
-const fmt = s => `${s.toFixed(1).replace('.', ',')} s`;
+const fmt = s => `${s.toLocaleString(LOCALE[lang], { minimumFractionDigits: 1, maximumFractionDigits: 1 })} s`;
 
 // ---- recording ----
 onPluck((i, midi, vel, t) => {
@@ -134,19 +135,19 @@ export function loadIntoLooper(rec) { load(rec); autosave(); }
 // Saving asks for a name first (prefilled), then opens the saved list so the result is visible.
 function askName() {
   if (!L.loopLen) return;
-  $('loopName').value = `Gravação ${saved().length + 1}`;
+  $('loopName').value = t('rec.defaultName', { n: saved().length + 1 });
   $('loopNameForm').hidden = false;
   $('loopName').focus();
   $('loopName').select();
 }
 function saveCurrent(name) {
   const list = saved();
-  list.unshift({ name: name.trim() || `Gravação ${list.length + 1}`, at: new Date().toISOString(), ...snapshot() });
+  list.unshift({ name: name.trim() || t('rec.defaultName', { n: list.length + 1 }), at: new Date().toISOString(), ...snapshot() });
   store.set('loops', list.slice(0, 30));
   $('loopNameForm').hidden = true;
   $('savedBox').open = true;
   render();
-  flashMsg(`"${list[0].name}" salva em Gravações salvas.`);
+  flashMsg(t('rec.savedMsg', { name: list[0].name }));
 }
 let msgTimer = null;
 function flashMsg(text) {
@@ -160,13 +161,13 @@ function flashMsg(text) {
 async function exportAudio(rec, btn) {
   const label = btn.textContent;
   btn.disabled = true;
-  btn.textContent = 'Gerando áudio…';
+  btn.textContent = t('rec.exporting');
   try {
     const blob = await renderRecording(rec);
-    const r = await shareOrDownload(blob, rec.name || 'Gravação');
-    flashMsg(r === 'shared' ? 'Áudio compartilhado.' : r === 'downloaded' ? 'Áudio baixado (arquivo .wav).' : 'Compartilhamento cancelado.');
+    const r = await shareOrDownload(blob, rec.name || t('rec.fileName'));
+    flashMsg(r === 'shared' ? t('rec.shared') : r === 'downloaded' ? t('rec.downloaded') : t('rec.shareCancelled'));
   } catch (e) {
-    flashMsg('Não foi possível gerar o áudio neste navegador.');
+    flashMsg(t('rec.exportFailed'));
   }
   btn.disabled = false;
   btn.textContent = label;
@@ -176,19 +177,19 @@ async function exportAudio(rec, btn) {
 function render() {
   const has = L.loopLen > 0;
   const rec = !!L.rec;
-  $('loopRec').textContent = rec ? (has ? 'Parar camada' : 'Parar e fazer o loop') : (has ? 'Gravar nova camada' : 'Gravar');
+  $('loopRec').textContent = rec ? (has ? t('rec.stopLayer') : t('rec.stopLoop')) : (has ? t('rec.newLayer') : t('rec.record'));
   $('loopRec').classList.toggle('recording', rec);
   $('loopRec').disabled = L.layers.length >= MAX_LAYERS && !rec;
-  $('loopPlay').textContent = L.playing ? 'Parar' : 'Tocar';
+  $('loopPlay').textContent = L.playing ? t('rec.stop') : t('rec.play');
   $('loopPlay').disabled = !has;
   $('loopUndo').disabled = !has || rec;
   $('loopClear').disabled = !L.layers.length || rec;
   $('loopSave').disabled = !has || rec;
   $('loopExport').disabled = !has || rec;
   $('loopStatus').textContent = rec
-    ? (has ? 'Gravando uma volta do loop por cima das camadas anteriores…' : 'Gravando… toque as cordas e aperte "Parar" para fechar o loop.')
-    : has ? `Loop de ${fmt(L.loopLen)} · ${L.layers.length} ${L.layers.length === 1 ? 'camada' : 'camadas'}${L.layers.length >= MAX_LAYERS ? ' (máximo)' : ''}`
-      : 'Aperte "Gravar", toque uma melodia e aperte de novo para fechar o loop.';
+    ? (has ? t('rec.recLayer') : t('rec.recFirst'))
+    : has ? t('rec.loopInfo', { len: fmt(L.loopLen), n: L.layers.length, max: L.layers.length >= MAX_LAYERS })
+      : t('rec.idle');
   const ul = $('loopLayers');
   ul.innerHTML = '';
   L.layers.forEach((layer, i) => {
@@ -197,30 +198,31 @@ function render() {
     b.type = 'button';
     b.className = 'chip';
     b.setAttribute('aria-pressed', !layer.muted);
-    b.textContent = `Camada ${i + 1} · ${layer.notes.length} notas${layer.muted ? ' (mudo)' : ''}`;
+    b.textContent = t('rec.layer', { i: i + 1, n: layer.notes.length, muted: layer.muted });
     b.addEventListener('click', () => { layer.muted = !layer.muted; autosave(); render(); });
     li.appendChild(b);
     ul.appendChild(li);
   });
   const list = saved();
   const sl = $('loopSaved');
-  sl.innerHTML = list.length ? '' : '<li class="note">Nenhuma gravação salva ainda.</li>';
+  sl.innerHTML = '';
+  if (!list.length) { const li = document.createElement('li'); li.className = 'note'; li.textContent = t('rec.noneSaved'); sl.appendChild(li); }
   list.forEach((r, i) => {
     const li = document.createElement('li');
     li.className = 'saved-row';
-    const when = (() => { try { return new Date(r.at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; } })();
+    const when = (() => { try { return new Date(r.at).toLocaleString(LOCALE[lang], { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; } })();
     li.innerHTML = `<span><b></b><small></small></span>`;
     li.querySelector('b').textContent = r.name;
-    li.querySelector('small').textContent = `${when} · ${fmt(r.loopLen)} · ${r.layers.length} ${r.layers.length === 1 ? 'camada' : 'camadas'}`;
+    li.querySelector('small').textContent = t('rec.savedInfo', { when, len: fmt(r.loopLen), n: r.layers.length });
     const open = document.createElement('button');
-    open.type = 'button'; open.className = 'btn'; open.textContent = 'Abrir';
-    open.addEventListener('click', () => { load(r); flashMsg(`"${r.name}" aberta. Aperte "Tocar" para ouvir.`); });
+    open.type = 'button'; open.className = 'btn'; open.textContent = t('rec.open');
+    open.addEventListener('click', () => { load(r); flashMsg(t('rec.openedMsg', { name: r.name })); });
     const ren = document.createElement('button');
-    ren.type = 'button'; ren.className = 'btn'; ren.textContent = 'Renomear';
+    ren.type = 'button'; ren.className = 'btn'; ren.textContent = t('rec.rename');
     ren.addEventListener('click', () => {
       const input = document.createElement('input');
       input.type = 'text'; input.value = r.name; input.className = 'name-input'; input.maxLength = 40;
-      input.setAttribute('aria-label', 'Novo nome');
+      input.setAttribute('aria-label', t('rec.renameAria'));
       const b = li.querySelector('b');
       b.replaceWith(input);
       input.focus(); input.select();
@@ -229,12 +231,12 @@ function render() {
       input.addEventListener('blur', done);
     });
     const dl = document.createElement('button');
-    dl.type = 'button'; dl.className = 'btn'; dl.textContent = 'Baixar áudio';
+    dl.type = 'button'; dl.className = 'btn'; dl.textContent = t('rec.export');
     dl.addEventListener('click', () => exportAudio(r, dl));
     const del = document.createElement('button');
-    del.type = 'button'; del.className = 'btn'; del.textContent = 'Apagar';
+    del.type = 'button'; del.className = 'btn'; del.textContent = t('rec.delete');
     del.addEventListener('click', () => {
-      if (!del.dataset.armed) { del.dataset.armed = '1'; del.textContent = 'Confirmar'; return; }
+      if (!del.dataset.armed) { del.dataset.armed = '1'; del.textContent = t('rec.deleteConfirm'); return; }
       const l = saved(); l.splice(i, 1); store.set('loops', l); render();
     });
     li.append(open, ren, dl, del);
@@ -253,8 +255,8 @@ $('loopUndo').addEventListener('click', () => {
 });
 $('loopClear').addEventListener('click', () => {
   const b = $('loopClear');
-  if (!b.dataset.armed) { b.dataset.armed = '1'; b.textContent = 'Toque de novo para limpar'; setTimeout(() => { b.dataset.armed = ''; b.textContent = 'Limpar'; }, 2500); return; }
-  b.dataset.armed = ''; b.textContent = 'Limpar';
+  if (!b.dataset.armed) { b.dataset.armed = '1'; b.textContent = t('rec.clearConfirm'); setTimeout(() => { b.dataset.armed = ''; b.textContent = t('rec.clear'); }, 2500); return; }
+  b.dataset.armed = ''; b.textContent = t('rec.clear');
   stopPlayback();
   L.layers = []; L.loopLen = 0; L.rec = null;
   autosave();
@@ -263,7 +265,7 @@ $('loopClear').addEventListener('click', () => {
 $('loopSave').addEventListener('click', askName);
 $('loopNameForm').addEventListener('submit', e => { e.preventDefault(); saveCurrent($('loopName').value); });
 $('loopNameCancel').addEventListener('click', () => { $('loopNameForm').hidden = true; });
-$('loopExport').addEventListener('click', () => exportAudio({ name: 'Gravação atual', ...snapshot() }, $('loopExport')));
+$('loopExport').addEventListener('click', () => exportAudio({ name: t('rec.current'), ...snapshot() }, $('loopExport')));
 
 // restore the loop from the last session (not playing until asked)
 const cur = store.get('loop-current', null);

@@ -1,6 +1,7 @@
 // Relax mode: a gentle generative melody over a bass on the downbeat, with an optional timer
 // that fades the volume out over the last minute and then stops.
 
+import { t } from './i18n.js';
 import { $, state, audio, now, play, setVolume, FULL_VOLUME, MODES } from './core.js';
 
 const TIMERS = [0, 10, 20, 30, 60]; // minutes; 0 = no limit
@@ -36,9 +37,9 @@ const mmss = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2
 
 function tickClock() {
   if (!on) return;
-  if (!endsAt) { $('relaxLeft').textContent = 'Sem limite de tempo'; return; }
+  if (!endsAt) { $('relaxLeft').textContent = t('relax.unlimited'); return; }
   const left = Math.max(0, endsAt - Date.now() / 1000);
-  $('relaxLeft').textContent = left > 0 ? `${mmss(left)} restantes${fading ? ' · diminuindo o volume' : ''}` : 'Terminando…';
+  $('relaxLeft').textContent = left > 0 ? t('relax.left', { time: mmss(left), fading }) : t('relax.ending');
   if (!fading && left <= 60) { fading = true; setVolume(0, left); }
   if (left <= 0) stop();
 }
@@ -73,9 +74,9 @@ export function stop() {
 export const isOn = () => on;
 
 function render() {
-  $('relaxBtn').textContent = on ? 'Parar' : 'Começar';
+  $('relaxBtn').textContent = on ? t('relax.stop') : t('relax.start');
   $('relaxBtn').classList.toggle('primary', !on);
-  if (!on) $('relaxLeft').textContent = minutes ? `Toca por ${minutes} minutos e diminui o volume no último.` : 'Toca até você parar.';
+  if (!on) $('relaxLeft').textContent = minutes ? t('relax.plan', { m: minutes }) : t('relax.planOpen');
   document.querySelectorAll('[data-min]').forEach(b => b.setAttribute('aria-pressed', +b.dataset.min === minutes));
 }
 
@@ -86,7 +87,7 @@ export function initRelax() {
     b.type = 'button';
     b.className = 'chip';
     b.dataset.min = m;
-    b.textContent = m ? `${m} min` : 'Sem limite';
+    b.textContent = m ? t('relax.minutes', { m }) : t('relax.noLimit');
     b.addEventListener('click', () => {
       minutes = m;
       if (on) { endsAt = m ? Date.now() / 1000 + m * 60 : 0; if (fading) { fading = false; setVolume(FULL_VOLUME, 1); } tickClock(); }

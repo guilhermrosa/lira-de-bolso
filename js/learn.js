@@ -1,6 +1,7 @@
 // Learn mode: a musical memory game. The lyre plays a short phrase, lighting its strings;
 // the player repeats it. Each correct round adds one note.
 
+import { t } from './i18n.js';
 import { $, store, state, audio, phrase, onPluck, guide } from './core.js';
 
 const RANGE = [4, 11];       // strings used: a comfortable middle octave
@@ -20,13 +21,13 @@ function clearTimers() { timers.forEach(clearTimeout); timers = []; cancelPhrase
 
 function playSequence() {
   phase = 'listen';
-  render(`Ouça: ${seq.length} notas.`);
+  render(t('learn.listen', { n: seq.length }));
   const gap = Math.max(0.32, 0.55 - seq.length * 0.015);
   const items = seq.map((i, k) => ({
     t: 0.4 + k * gap, midi: state.notes[i], vel: 0.55,
     onStart: () => { guide([i]); later(() => guide([]), gap * 800); },
   }));
-  cancelPhrase = phrase(items, () => { phase = 'your-turn'; pos = 0; render('Sua vez: repita nas cordas.'); });
+  cancelPhrase = phrase(items, () => { phase = 'your-turn'; pos = 0; render(t('learn.yourTurn')); });
 }
 
 function newGame() {
@@ -44,7 +45,7 @@ onPluck(i => {
       phase = 'listen';
       const round = seq.length - START_LEN + 1;
       if (round > best) { best = round; store.set('learn-best', best); }
-      render(`Isso! Rodada ${round} completa.`);
+      render(t('learn.right', { round }));
       seq.push(rnd());
       later(playSequence, 1100);
     }
@@ -54,22 +55,22 @@ onPluck(i => {
     const round = seq.length - START_LEN;
     guide([seq[pos]]);
     later(() => guide([]), 1400);
-    render(`Era a corda acesa. Você completou ${round} ${round === 1 ? 'rodada' : 'rodadas'}.`);
+    render(t('learn.wrong', { round }));
   }
 });
 
 function render(msg) {
   if (msg) $('learnStatus').textContent = msg;
-  $('learnBest').textContent = best ? `Melhor: ${best} ${best === 1 ? 'rodada' : 'rodadas'}` : 'Ainda sem recorde';
-  $('learnBtn').textContent = phase === 'idle' ? 'Começar' : 'Recomeçar';
+  $('learnBest').textContent = best ? t('learn.best', { n: best }) : t('learn.noBest');
+  $('learnBtn').textContent = phase === 'idle' ? t('learn.start') : t('learn.restart');
 }
 
 export function initLearn() {
   $('learnBtn').addEventListener('click', newGame);
-  render('A lira toca uma frase curta e acende as cordas. Repita na mesma ordem; a cada acerto a frase ganha uma nota.');
+  render(t('learn.intro'));
 }
 export function stopLearn() {
   clearTimers();
   guide([]);
-  if (phase !== 'idle') { phase = 'idle'; render('Jogo interrompido. Toque em "Começar" para jogar de novo.'); }
+  if (phase !== 'idle') { phase = 'idle'; render(t('learn.stopped')); }
 }

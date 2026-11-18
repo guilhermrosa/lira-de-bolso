@@ -4,40 +4,125 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Privacidade · Lira de Bolso</title>
-  <meta name="description" content="Como a Lira de Bolso trata os seus dados: tudo fica no seu aparelho.">
+  <meta name="description" content="Como a Lira de Bolso trata os seus dados: tudo fica no seu aparelho. Privacy · Privacidad · 隐私">
   <link rel="icon" href="icons/icon-192.png" type="image/png">
   <link rel="stylesheet" href="css/style.css">
+  <!-- the same theme and language as the app (v0.10): one page, four languages -->
+  <script>
+    try { const t = JSON.parse(localStorage.getItem('lira-theme')); if (t === 'marmore' || t === 'noite') document.documentElement.dataset.theme = t; } catch (e) {}
+  </script>
   <style>
     main { max-width: 640px; margin: 0 auto; padding: 32px 16px 56px; display: grid; gap: 14px; }
+    article { display: grid; gap: 14px; }
     h1 { font-size: 30px; } h2 { margin-top: 10px; }
     p, li { line-height: 1.6; margin: 0; } ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
     a { color: var(--black); font-weight: 600; }
+    .langs { display: flex; flex-wrap: wrap; gap: 8px; }
   </style>
 </head>
 <body>
 <main>
   <p class="eyebrow">Lira de Bolso</p>
-  <h1>Privacidade</h1>
-  <p><strong>Resumo:</strong> a Lira não coleta, não envia e não vende nenhum dado seu. Não tem cadastro, anúncios nem rastreamento. Tudo o que ela guarda fica no seu aparelho.</p>
+  <nav class="langs" aria-label="Idioma · Language · Idioma · 语言">
+    <button class="chip" type="button" data-lang="pt" lang="pt-BR">Português</button>
+    <button class="chip" type="button" data-lang="en" lang="en">English</button>
+    <button class="chip" type="button" data-lang="es" lang="es">Español</button>
+    <button class="chip" type="button" data-lang="zh" lang="zh-Hans">中文（简体）</button>
+  </nav>
 
-  <h2>O que fica no seu aparelho</h2>
-  <ul>
-    <li>As suas gravações (as notas, inclusive as que vierem da sua voz; nunca o áudio da voz), o timbre e a escala escolhidos e o seu melhor resultado no jogo da memória.</li>
-    <li>Ficam no armazenamento do navegador (ou do app instalado) neste aparelho, e só a própria Lira os lê. Nada disso é enviado para lugar nenhum.</li>
-    <li>"Baixar áudio" cria o arquivo no próprio aparelho; ele só sai dali se você mesmo escolher compartilhá-lo.</li>
-    <li>Para apagar: use "Apagar" nas gravações salvas, na aba Tocar, ou limpe os dados do site nas configurações do navegador.</li>
-  </ul>
+  <article data-lang="pt" lang="pt-BR">
+    <h1>Privacidade</h1>
+    <p><strong>Resumo:</strong> a Lira não coleta, não envia e não vende nenhum dado seu. Não tem cadastro, anúncios nem rastreamento. Tudo o que ela guarda fica no seu aparelho.</p>
+    <h2>O que fica no seu aparelho</h2>
+    <ul>
+      <li>As suas gravações (as notas, inclusive as que vierem da sua voz; nunca o áudio da voz), o timbre, a escala, o tema e o idioma escolhidos e o seu melhor resultado no jogo da memória.</li>
+      <li>Ficam no armazenamento do navegador (ou do app instalado) neste aparelho, e só a própria Lira os lê. Nada disso é enviado para lugar nenhum.</li>
+      <li>"Baixar áudio" cria o arquivo no próprio aparelho; ele só sai dali se você mesmo escolher compartilhá-lo.</li>
+      <li>Para apagar: use "Apagar" nas gravações salvas, na aba Tocar, ou limpe os dados do site nas configurações do navegador.</li>
+    </ul>
+    <h2>Hospedagem</h2>
+    <p>A Lira é publicada pelo GitHub Pages. Como qualquer site, o GitHub pode registrar dados técnicos de acesso, como o endereço IP, conforme a <a href="https://docs.github.com/pt/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener">declaração de privacidade do GitHub</a>. Fora isso, a Lira não se comunica com nenhum outro serviço: até as fontes vêm do próprio site.</p>
+    <h2>Permissões</h2>
+    <p>A Lira não usa câmera, localização nem contatos. O som da lira é todo sintetizado no aparelho.</p>
+    <p><strong>Microfone (só se você quiser):</strong> em "Da sua voz para a lira", na aba Tocar, o botão "Gravar voz" pede acesso ao microfone para ouvir a melodia que você cantarola. O navegador pergunta antes, e você pode negar ou retirar a permissão quando quiser nas configurações dele. A gravação é analisada no próprio aparelho para achar as notas e depois descartada: o áudio da sua voz não é guardado nem enviado a lugar nenhum. Só ficam as notas, e só se você apertar "Salvar gravação".</p>
+    <p><strong>Arquivos de áudio:</strong> "Abrir áudio" lê o arquivo que você escolher, no próprio aparelho, do mesmo jeito; ele não é copiado nem enviado.</p>
+    <p class="note">Atualizado em 18 de novembro de 2026. Dúvidas: <a href="https://github.com/guilhermrosa/lira-de-bolso/issues" rel="noopener">abra um tópico no repositório da Lira</a>.</p>
+    <p><a href="./">← Voltar para a Lira</a></p>
+  </article>
 
-  <h2>Hospedagem</h2>
-  <p>A Lira é publicada pelo GitHub Pages. Como qualquer site, o GitHub pode registrar dados técnicos de acesso, como o endereço IP, conforme a <a href="https://docs.github.com/pt/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener">declaração de privacidade do GitHub</a>. Fora isso, a Lira não se comunica com nenhum outro serviço: até as fontes vêm do próprio site.</p>
+  <article data-lang="en" lang="en" hidden>
+    <h1>Privacy</h1>
+    <p><strong>In short:</strong> the Lyre does not collect, send or sell any of your data. There is no sign-up, no ads and no tracking. Everything it keeps stays on your device.</p>
+    <h2>What stays on your device</h2>
+    <ul>
+      <li>Your recordings (the notes, including those that come from your voice; never the audio of your voice), the sound, scale, theme and language you chose, and your best score in the memory game.</li>
+      <li>They are kept in the browser's storage (or the installed app's) on this device, and only the Lyre reads them. None of it is sent anywhere.</li>
+      <li>"Download audio" creates the file on your device; it only leaves it if you choose to share it.</li>
+      <li>To delete: use "Delete" on the saved recordings, in the Play tab, or clear the site's data in your browser settings.</li>
+    </ul>
+    <h2>Hosting</h2>
+    <p>The Lyre is published on GitHub Pages. Like any website, GitHub may log technical access data such as the IP address, as described in the <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener">GitHub privacy statement</a>. Apart from that, the Lyre talks to no other service: even its fonts come from its own site.</p>
+    <h2>Permissions</h2>
+    <p>The Lyre does not use the camera, location or contacts. Its sound is entirely synthesised on the device.</p>
+    <p><strong>Microphone (only if you want):</strong> in "From your voice to the lyre", in the Play tab, the "Record voice" button asks for the microphone to hear the melody you hum. The browser asks you first, and you can refuse or withdraw the permission at any time in its settings. The recording is analysed on your device to find the notes and then thrown away: the audio of your voice is neither kept nor sent anywhere. Only the notes remain, and only if you press "Save recording".</p>
+    <p><strong>Audio files:</strong> "Open audio" reads the file you choose, on your device, in the same way; it is neither copied nor sent.</p>
+    <p class="note">Updated 18 November 2026. Questions: <a href="https://github.com/guilhermrosa/lira-de-bolso/issues" rel="noopener">open an issue in the Lyre's repository</a>.</p>
+    <p><a href="./">← Back to the Lyre</a></p>
+  </article>
 
-  <h2>Permissões</h2>
-  <p>A Lira não usa câmera, localização nem contatos. O som da lira é todo sintetizado no aparelho.</p>
-  <p><strong>Microfone (só se você quiser):</strong> em "Da sua voz para a lira", na aba Tocar, o botão "Gravar voz" pede acesso ao microfone para ouvir a melodia que você cantarola. O navegador pergunta antes, e você pode negar ou retirar a permissão quando quiser nas configurações dele. A gravação é analisada no próprio aparelho para achar as notas e depois descartada: o áudio da sua voz não é guardado nem enviado a lugar nenhum. Só ficam as notas, e só se você apertar "Salvar gravação".</p>
-  <p><strong>Arquivos de áudio:</strong> "Abrir áudio" lê o arquivo que você escolher, no próprio aparelho, do mesmo jeito; ele não é copiado nem enviado.</p>
+  <article data-lang="es" lang="es" hidden>
+    <h1>Privacidad</h1>
+    <p><strong>En resumen:</strong> la Lira no recopila, no envía ni vende ningún dato tuyo. No tiene registro, anuncios ni rastreo. Todo lo que guarda se queda en tu dispositivo.</p>
+    <h2>Qué se queda en tu dispositivo</h2>
+    <ul>
+      <li>Tus grabaciones (las notas, incluidas las que vienen de tu voz; nunca el audio de la voz), el timbre, la escala, el tema y el idioma elegidos y tu mejor resultado en el juego de memoria.</li>
+      <li>Se guardan en el almacenamiento del navegador (o de la app instalada) en este dispositivo, y solo la propia Lira los lee. Nada de eso se envía a ningún sitio.</li>
+      <li>"Descargar audio" crea el archivo en tu dispositivo; solo sale de ahí si tú decides compartirlo.</li>
+      <li>Para borrar: usa "Eliminar" en las grabaciones guardadas, en la pestaña Tocar, o borra los datos del sitio en los ajustes del navegador.</li>
+    </ul>
+    <h2>Alojamiento</h2>
+    <p>La Lira se publica en GitHub Pages. Como cualquier sitio web, GitHub puede registrar datos técnicos de acceso, como la dirección IP, según la <a href="https://docs.github.com/es/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener">declaración de privacidad de GitHub</a>. Aparte de eso, la Lira no se comunica con ningún otro servicio: hasta las fuentes vienen del propio sitio.</p>
+    <h2>Permisos</h2>
+    <p>La Lira no usa la cámara, la ubicación ni los contactos. Su sonido se sintetiza por completo en el dispositivo.</p>
+    <p><strong>Micrófono (solo si quieres):</strong> en "De tu voz a la lira", en la pestaña Tocar, el botón "Grabar voz" pide acceso al micrófono para escuchar la melodía que tarareas. El navegador te pregunta antes, y puedes negar o retirar el permiso cuando quieras en sus ajustes. La grabación se analiza en tu dispositivo para encontrar las notas y luego se descarta: el audio de tu voz no se guarda ni se envía a ningún sitio. Solo quedan las notas, y solo si pulsas "Guardar grabación".</p>
+    <p><strong>Archivos de audio:</strong> "Abrir audio" lee el archivo que elijas, en tu dispositivo, de la misma manera; no se copia ni se envía.</p>
+    <p class="note">Actualizado el 18 de noviembre de 2026. Dudas: <a href="https://github.com/guilhermrosa/lira-de-bolso/issues" rel="noopener">abre un tema en el repositorio de la Lira</a>.</p>
+    <p><a href="./">← Volver a la Lira</a></p>
+  </article>
 
-  <p class="note">Atualizado em 18 de novembro de 2026. Dúvidas: <a href="https://github.com/guilhermrosa/lira-de-bolso/issues" rel="noopener">abra um tópico no repositório da Lira</a>.</p>
-  <p><a href="./">← Voltar para a Lira</a></p>
+  <article data-lang="zh" lang="zh-Hans" hidden>
+    <h1>隐私</h1>
+    <p><strong>简而言之：</strong>本应用不收集、不发送、不出售你的任何数据。没有注册、没有广告、没有追踪。它保存的一切都留在你的设备上。</p>
+    <h2>留在你设备上的内容</h2>
+    <ul>
+      <li>你的录音（只保存音符，包括来自你声音的音符；从不保存你的声音音频）、你选择的音色、音阶、主题和语言，以及记忆游戏的最佳成绩。</li>
+      <li>这些内容保存在此设备的浏览器（或已安装应用）存储中，只有本应用会读取。它们不会被发送到任何地方。</li>
+      <li>“下载音频”会在你的设备上生成文件；只有你自己选择分享时，它才会离开设备。</li>
+      <li>删除方法：在“弹奏”页的已保存录音中点“删除”，或在浏览器设置中清除本网站的数据。</li>
+    </ul>
+    <h2>托管</h2>
+    <p>本应用发布在 GitHub Pages 上。和任何网站一样，GitHub 可能会记录 IP 地址等技术访问数据，详见 <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener">GitHub 隐私声明</a>。除此之外，本应用不与任何其他服务通信：连字体也来自本网站。</p>
+    <h2>权限</h2>
+    <p>本应用不使用摄像头、位置或通讯录。琴声完全在设备上合成。</p>
+    <p><strong>麦克风（仅在你愿意时）：</strong>在“弹奏”页的“从你的声音到里拉琴”中，“录制声音”按钮会请求使用麦克风，以听取你哼唱的旋律。浏览器会先征求你的同意，你也可以随时在浏览器设置中拒绝或撤回权限。录音只在你的设备上分析以找出音符，随后即被丢弃：你的声音音频既不会保存，也不会发送到任何地方。只保留音符，而且只有在你点“保存录音”时才保留。</p>
+    <p><strong>音频文件：</strong>“打开音频”同样只在你的设备上读取你选择的文件，不会复制或发送。</p>
+    <p class="note">更新于 2026 年 11 月 18 日。如有疑问：<a href="https://github.com/guilhermrosa/lira-de-bolso/issues" rel="noopener">在本应用的代码仓库中提交问题</a>。</p>
+    <p><a href="./">← 返回应用</a></p>
+  </article>
 </main>
+<script>
+  const LANGS = ['pt', 'en', 'es', 'zh'], HTML = { pt: 'pt-BR', en: 'en', es: 'es', zh: 'zh-Hans' }, TITLE = { pt: 'Privacidade', en: 'Privacy', es: 'Privacidad', zh: '隐私' };
+  function show(l) {
+    document.querySelectorAll('article').forEach(a => { a.hidden = a.dataset.lang !== l; });
+    document.querySelectorAll('.langs [data-lang]').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang === l));
+    document.documentElement.lang = HTML[l];
+    document.title = TITLE[l] + ' · Lira de Bolso';
+  }
+  let l = null;
+  try { l = JSON.parse(localStorage.getItem('lira-lang')); } catch (e) {}
+  if (!LANGS.includes(l)) l = (navigator.languages || [navigator.language || '']).map(x => String(x).slice(0, 2).toLowerCase()).find(x => LANGS.includes(x)) || 'en';
+  show(l);
+  document.querySelectorAll('.langs [data-lang]').forEach(b => b.addEventListener('click', () => show(b.dataset.lang)));
+</script>
 </body>
 </html>

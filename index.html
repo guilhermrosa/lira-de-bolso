@@ -20,114 +20,114 @@
 <div class="wrap">
   <header>
     <div class="topbar">
-      <p class="eyebrow">Instrumento de cordas · <span id="verLabel">versão</span><script>document.getElementById('verLabel').textContent = 'versão ' + self.APP_VERSION;</script></p>
-      <button class="btn settings-btn" type="button" id="settingsOpen" aria-haspopup="dialog">Ajustes</button>
+      <p class="eyebrow" id="verLabel">&nbsp;</p>
+      <button class="btn settings-btn" type="button" id="settingsOpen" aria-haspopup="dialog" data-i18n="head.settings">Ajustes</button>
     </div>
     <h1>Lira de Bolso</h1>
-    <p class="lead">Cordas dedilhadas sintetizadas na hora, sem nenhum arquivo de áudio. Toque ou arraste o dedo pelas cordas. Grave em camadas, relaxe com música contínua, treine a memória ou toque canções.</p>
+    <p class="lead" data-i18n="head.lead">Cordas dedilhadas sintetizadas na hora, sem nenhum arquivo de áudio. Toque ou arraste o dedo pelas cordas. Grave em camadas, relaxe com música contínua, treine a memória ou toque canções.</p>
   </header>
   <div class="meander" aria-hidden="true"></div>
 
   <div class="lyre">
     <div class="lyre-top">
-      <h2>Cordas</h2>
+      <h2 data-i18n="lyre.title">Cordas</h2>
       <small id="kbdHint">Arraste para dedilhar várias. No computador, use as teclas.</small>
     </div>
-    <div class="strings" id="strings" tabindex="0" aria-label="Cordas da lira. Toque ou arraste para tocar."></div>
+    <div class="strings" id="strings" tabindex="0" data-i18n-aria="lyre.aria" aria-label="Cordas da lira. Toque ou arraste para tocar."></div>
     <div class="labels" id="labels" aria-hidden="true"></div>
   </div>
 
-  <nav class="tabs" role="tablist" aria-label="Modos">
-    <button class="tab" id="tab-tocar" role="tab" type="button" aria-controls="panel-tocar">Tocar</button>
-    <button class="tab" id="tab-relaxar" role="tab" type="button" aria-controls="panel-relaxar">Relaxar</button>
-    <button class="tab" id="tab-memoria" role="tab" type="button" aria-controls="panel-memoria">Memória</button>
-    <button class="tab" id="tab-cancoes" role="tab" type="button" aria-controls="panel-cancoes">Canções</button>
+  <nav class="tabs" role="tablist" aria-label="Modos" data-i18n-aria="tabs.aria">
+    <button class="tab" id="tab-tocar" role="tab" type="button" aria-controls="panel-tocar" data-i18n="tab.tocar">Tocar</button>
+    <button class="tab" id="tab-relaxar" role="tab" type="button" aria-controls="panel-relaxar" data-i18n="tab.relaxar">Relaxar</button>
+    <button class="tab" id="tab-memoria" role="tab" type="button" aria-controls="panel-memoria" data-i18n="tab.memoria">Memória</button>
+    <button class="tab" id="tab-cancoes" role="tab" type="button" aria-controls="panel-cancoes" data-i18n="tab.cancoes">Canções</button>
   </nav>
 
   <div class="panel" id="panel-tocar" role="tabpanel" aria-labelledby="tab-tocar">
     <section class="rec" aria-labelledby="hRec">
       <div class="rec-head">
-        <h2 id="hRec">Gravação em camadas</h2>
+        <h2 id="hRec" data-i18n="rec.title">Gravação em camadas</h2>
         <div class="loop-bar" id="loopBar" aria-hidden="true"><i></i></div>
       </div>
       <p class="note" id="loopStatus"></p>
       <div class="btns">
         <button class="btn primary" type="button" id="loopRec">Gravar</button>
         <button class="btn" type="button" id="loopPlay">Tocar</button>
-        <button class="btn" type="button" id="loopUndo">Desfazer camada</button>
-        <button class="btn" type="button" id="loopClear">Limpar</button>
-        <button class="btn" type="button" id="loopSave">Salvar gravação</button>
-        <button class="btn" type="button" id="loopExport">Baixar áudio</button>
+        <button class="btn" type="button" id="loopUndo" data-i18n="rec.undo">Desfazer camada</button>
+        <button class="btn" type="button" id="loopClear" data-i18n="rec.clear">Limpar</button>
+        <button class="btn" type="button" id="loopSave" data-i18n="rec.save">Salvar gravação</button>
+        <button class="btn" type="button" id="loopExport" data-i18n="rec.export">Baixar áudio</button>
       </div>
       <form class="name-form" id="loopNameForm" hidden>
-        <label for="loopName">Nome da gravação</label>
+        <label for="loopName" data-i18n="rec.nameLabel">Nome da gravação</label>
         <input type="text" id="loopName" maxlength="40" autocomplete="off">
-        <button class="btn primary" type="submit">Salvar</button>
-        <button class="btn" type="button" id="loopNameCancel">Cancelar</button>
+        <button class="btn primary" type="submit" data-i18n="rec.nameSave">Salvar</button>
+        <button class="btn" type="button" id="loopNameCancel" data-i18n="rec.cancel">Cancelar</button>
       </form>
       <p class="msg" id="loopMsg" hidden role="status"></p>
-      <ul class="layers" id="loopLayers" aria-label="Camadas (toque para silenciar)"></ul>
+      <ul class="layers" id="loopLayers" data-i18n-aria="rec.layersAria" aria-label="Camadas (toque para silenciar)"></ul>
       <details class="saved" id="savedBox">
-        <summary>Gravações salvas</summary>
+        <summary data-i18n="rec.saved">Gravações salvas</summary>
         <ul id="loopSaved"></ul>
       </details>
     </section>
 
     <section class="rec hum" aria-labelledby="hHum">
       <div class="rec-head">
-        <h2 id="hHum">Da sua voz para a lira</h2>
+        <h2 id="hHum" data-i18n="hum.title">Da sua voz para a lira</h2>
         <div class="loop-bar level" id="humLevel" aria-hidden="true"><i></i></div>
       </div>
-      <p class="note" id="humStatus" role="status">Cantarole, cante ou assobie uma melodia (até 30 s) e a lira toca de volta.</p>
+      <p class="note" id="humStatus" role="status" data-i18n="hum.intro">Cantarole, cante ou assobie uma melodia (até 30 s) e a lira toca de volta.</p>
       <div class="btns">
         <button class="btn primary" type="button" id="humRec">Gravar voz</button>
-        <label class="btn" id="humFileBtn" for="humFile">Abrir áudio</label>
+        <label class="btn" id="humFileBtn" for="humFile" data-i18n="hum.open">Abrir áudio</label>
         <input type="file" id="humFile" accept="audio/*" hidden>
       </div>
       <div class="chips hum-opts">
-        <button class="chip" type="button" id="humAuto" aria-pressed="true">Escolher a escala</button>
-        <button class="chip" type="button" id="humRhythm" aria-pressed="true">Ajustar o ritmo</button>
+        <button class="chip" type="button" id="humAuto" aria-pressed="true" data-i18n="hum.auto">Escolher a escala</button>
+        <button class="chip" type="button" id="humRhythm" aria-pressed="true" data-i18n="hum.rhythm">Ajustar o ritmo</button>
       </div>
       <div id="humResult" hidden>
-        <canvas class="roll" id="humRoll" aria-label="A melodia nas cordas da lira"></canvas>
+        <canvas class="roll" id="humRoll" data-i18n-aria="hum.rollAria" aria-label="A melodia nas cordas da lira"></canvas>
         <div class="btns">
           <button class="btn primary" type="button" id="humPlay">Ouvir</button>
-          <button class="btn" type="button" id="humSave">Salvar gravação</button>
-          <button class="btn" type="button" id="humToLoop">Levar para o gravador</button>
-          <button class="btn" type="button" id="humDiscard">Descartar</button>
+          <button class="btn" type="button" id="humSave" data-i18n="hum.save">Salvar gravação</button>
+          <button class="btn" type="button" id="humToLoop" data-i18n="hum.toLoop">Levar para o gravador</button>
+          <button class="btn" type="button" id="humDiscard" data-i18n="hum.discard">Descartar</button>
         </div>
       </div>
-      <p class="note small">Funciona melhor com uma voz só, num lugar quieto, uma nota de cada vez. "Abrir áudio" serve para uma gravação de voz ou de um instrumento solo; música com banda ainda não. O som é analisado no próprio aparelho e não é enviado a lugar nenhum.</p>
+      <p class="note small" data-i18n="hum.tip">Funciona melhor com uma voz só, num lugar quieto, uma nota de cada vez. "Abrir áudio" serve para uma gravação de voz ou de um instrumento solo; música com banda ainda não. O som é analisado no próprio aparelho e não é enviado a lugar nenhum.</p>
     </section>
 
     <div class="grid">
       <section aria-labelledby="hTimbre">
-        <h2 id="hTimbre">Timbre</h2>
+        <h2 id="hTimbre" data-i18n="timbre.title">Timbre</h2>
         <div class="chips" id="presets"></div>
         <div class="slider">
-          <div class="slider-head"><label for="sChip">Caráter</label><output id="oChip"></output></div>
+          <div class="slider-head"><label for="sChip" data-i18n="timbre.chip">Caráter</label><output id="oChip"></output></div>
           <input type="range" id="sChip" min="0" max="100">
-          <div class="slider-ends"><span>Orgânico</span><span>Chiptune</span></div>
+          <div class="slider-ends"><span data-i18n="timbre.chipLo">Orgânico</span><span data-i18n="timbre.chipHi">Chiptune</span></div>
         </div>
         <div class="slider">
-          <div class="slider-head"><label for="sBright">Brilho</label><output id="oBright"></output></div>
+          <div class="slider-head"><label for="sBright" data-i18n="timbre.bright">Brilho</label><output id="oBright"></output></div>
           <input type="range" id="sBright" min="0" max="100">
-          <div class="slider-ends"><span>Abafado</span><span>Metálico</span></div>
+          <div class="slider-ends"><span data-i18n="timbre.brightLo">Abafado</span><span data-i18n="timbre.brightHi">Metálico</span></div>
         </div>
         <div class="slider">
-          <div class="slider-head"><label for="sSustain">Sustentação</label><output id="oSustain"></output></div>
+          <div class="slider-head"><label for="sSustain" data-i18n="timbre.sustain">Sustentação</label><output id="oSustain"></output></div>
           <input type="range" id="sSustain" min="0" max="100">
-          <div class="slider-ends"><span>Curta</span><span>Longa</span></div>
+          <div class="slider-ends"><span data-i18n="timbre.sustainLo">Curta</span><span data-i18n="timbre.sustainHi">Longa</span></div>
         </div>
         <div class="slider">
-          <div class="slider-head"><label for="sEcho">Eco</label><output id="oEcho"></output></div>
+          <div class="slider-head"><label for="sEcho" data-i18n="timbre.echo">Eco</label><output id="oEcho"></output></div>
           <input type="range" id="sEcho" min="0" max="100">
-          <div class="slider-ends"><span>Seco</span><span>Salão de pedra</span></div>
+          <div class="slider-ends"><span data-i18n="timbre.echoLo">Seco</span><span data-i18n="timbre.echoHi">Salão de pedra</span></div>
         </div>
       </section>
 
       <section aria-labelledby="hScale">
-        <h2 id="hScale">Escala</h2>
+        <h2 id="hScale" data-i18n="scale.title">Escala</h2>
         <div class="chips" id="modes"></div>
         <p class="mode-desc" id="modeDesc"></p>
       </section>
@@ -137,18 +137,18 @@
 
   <div class="panel" id="panel-relaxar" role="tabpanel" aria-labelledby="tab-relaxar" hidden>
     <section>
-      <h2>Relaxar</h2>
-      <p class="note">Uma melodia calma e sempre diferente, no timbre e na escala escolhidos em "Tocar". Com timer, o volume diminui aos poucos no último minuto.</p>
-      <div class="chips" id="relaxTimers" aria-label="Duração"></div>
+      <h2 data-i18n="relax.title">Relaxar</h2>
+      <p class="note" data-i18n="relax.intro">Uma melodia calma e sempre diferente, no timbre e na escala escolhidos em "Tocar". Com timer, o volume diminui aos poucos no último minuto.</p>
+      <div class="chips" id="relaxTimers" data-i18n-aria="relax.timersAria" aria-label="Duração"></div>
       <div class="btns"><button class="btn primary big" type="button" id="relaxBtn">Começar</button></div>
       <p class="status" id="relaxLeft" aria-live="polite"></p>
-      <p class="note">No celular, a música pode parar se a tela bloquear; deixe o app aberto.</p>
+      <p class="note" data-i18n="relax.note">No celular, a música pode parar se a tela bloquear; deixe o app aberto.</p>
     </section>
   </div>
 
   <div class="panel" id="panel-memoria" role="tabpanel" aria-labelledby="tab-memoria" hidden>
     <section>
-      <h2>Jogo da memória</h2>
+      <h2 data-i18n="learn.title">Jogo da memória</h2>
       <p class="status" id="learnStatus" aria-live="polite"></p>
       <div class="btns"><button class="btn primary big" type="button" id="learnBtn">Começar</button></div>
       <p class="note" id="learnBest"></p>
@@ -157,15 +157,15 @@
 
   <div class="panel" id="panel-cancoes" role="tabpanel" aria-labelledby="tab-cancoes" hidden>
     <section>
-      <h2>Canções</h2>
+      <h2 data-i18n="songs.title">Canções</h2>
       <div class="song-groups" id="songList"></div>
-      <h3 class="sub">Suas gravações</h3>
+      <h3 class="sub" data-i18n="songs.mine">Suas gravações</h3>
       <div class="chips" id="mySongs"></div>
-      <p class="note" id="mySongsEmpty">As gravações que você salvar em "Tocar" aparecem aqui para ouvir ou tocar junto.</p>
+      <p class="note" id="mySongsEmpty" data-i18n="songs.mineEmpty">As gravações que você salvar em "Tocar" aparecem aqui para ouvir ou tocar junto.</p>
       <p class="note" id="songFrom"></p>
       <div class="btns">
-        <button class="btn" type="button" id="songListen">Ouvir</button>
-        <button class="btn primary" type="button" id="songAlong">Tocar junto</button>
+        <button class="btn" type="button" id="songListen" data-i18n="songs.listen">Ouvir</button>
+        <button class="btn primary" type="button" id="songAlong" data-i18n="songs.along">Tocar junto</button>
       </div>
       <p class="status" id="songStatus" aria-live="polite"></p>
       <p class="note" id="songNote" hidden>As canções usam a escala Jônio (maior); a escala foi trocada. Você pode mudá-la de volta em "Tocar".</p>
@@ -173,19 +173,23 @@
   </div>
   <dialog class="settings" id="settings" aria-labelledby="hSettings">
     <form method="dialog">
-      <h2 id="hSettings">Ajustes</h2>
+      <h2 id="hSettings" data-i18n="settings.title">Ajustes</h2>
       <section aria-labelledby="hTheme">
-        <h3 class="sub" id="hTheme">Tema</h3>
+        <h3 class="sub" id="hTheme" data-i18n="settings.theme">Tema</h3>
         <div class="theme-chips" id="themes">
-          <button class="theme-chip" type="button" data-theme="anfora"><i class="sw-anfora"></i>Ânfora</button>
-          <button class="theme-chip" type="button" data-theme="marmore"><i class="sw-marmore"></i>Mármore e Egeu</button>
-          <button class="theme-chip" type="button" data-theme="noite"><i class="sw-noite"></i>Noite no templo</button>
+          <button class="theme-chip" type="button" data-theme="anfora"><i class="sw-anfora"></i><span data-i18n="theme.anfora">Ânfora</span></button>
+          <button class="theme-chip" type="button" data-theme="marmore"><i class="sw-marmore"></i><span data-i18n="theme.marmore">Mármore e Egeu</span></button>
+          <button class="theme-chip" type="button" data-theme="noite"><i class="sw-noite"></i><span data-i18n="theme.noite">Noite no templo</span></button>
         </div>
       </section>
-      <div class="btns"><button class="btn primary" value="close">Fechar</button></div>
+      <section aria-labelledby="hLang">
+        <h3 class="sub" id="hLang" data-i18n="settings.lang">Idioma</h3>
+        <div class="chips" id="langs"></div>
+      </section>
+      <div class="btns"><button class="btn primary" value="close" data-i18n="settings.close">Fechar</button></div>
     </form>
   </dialog>
-  <footer class="foot"><a href="privacidade.html">Privacidade</a> · nada sai do seu aparelho</footer>
+  <footer class="foot"><a href="privacidade.html" data-i18n="foot.privacy">Privacidade</a> · <span data-i18n="foot.local">nada sai do seu aparelho</span></footer>
 </div>
 <script type="module" src="js/app.js"></script>
 </body>

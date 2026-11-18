@@ -3,6 +3,7 @@
 // the layered recorder. Everything happens on the device: the sound is analysed here (pitch.js)
 // and never sent anywhere.
 
+import { t } from './i18n.js';
 import { $, state, audio, phrase, setMode, MODES } from './core.js';
 import { transcribe, stringsOf, ANALYSIS_RATE } from './pitch.js';
 import { addSaved, loadIntoLooper } from './looper.js';
@@ -29,7 +30,7 @@ async function toSamples(arrayBuffer, limit) {
 // ---- microphone ----
 async function startMic() {
   if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
-    status('Este navegador não deixa gravar a voz. Tente "Abrir áudio" com um arquivo gravado no celular.');
+    status(t('hum.noRecorder'));
     return;
   }
   const ac = audio();
@@ -37,7 +38,7 @@ async function startMic() {
   try {
     stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: true } });
   } catch (e) {
-    status('Sem acesso ao microfone. Para gravar, permita o microfone para este site nas configurações do navegador.');
+    status(t('hum.noMic'));
     return;
   }
   stopListening();
@@ -57,7 +58,7 @@ async function startMic() {
     let peak = 0; for (const v of data) peak = Math.max(peak, Math.abs(v));
     $('humLevel').style.setProperty('--p', Math.min(1, peak * 1.6).toFixed(3));
     const s = (performance.now() - t0) / 1000;
-    status(`Gravando… ${Math.floor(s)} s de ${MAX_SECONDS}. Aperte "Parar" quando terminar.`);
+    status(t('hum.recording', { s: Math.floor(s), max: MAX_SECONDS }));
     if (s >= MAX_SECONDS) { stopMic(); return; }
     H.rec.timer = requestAnimationFrame(meter);
   };
@@ -65,13 +66,13 @@ async function startMic() {
     stream.getTracks().forEach(t => t.stop());
     mic.disconnect();
     $('humLevel').style.setProperty('--p', 0);
-    status('Ouvindo as notas…');
+    status(t('hum.analysing'));
     try {
       const blob = new Blob(chunks, { type: rec.mimeType || 'audio/webm' });
       H.samples = await toSamples(await blob.arrayBuffer(), MAX_SECONDS);
       H.source = 'voz';
       analyse();
-    } catch (e) { status('Não consegui ler a gravação neste navegador.'); }
+    } catch (e) { status(t('hum.readFailed')); }
     render();
   };
   rec.start();
@@ -91,13 +92,13 @@ function stopMic() {
 async function openFile(file) {
   if (!file) return;
   stopListening();
-  status('Ouvindo as notas…');
+  status(t('hum.analysing'));
   try {
     H.samples = await toSamples(await file.arrayBuffer(), 60);
     H.source = 'arquivo';
     analyse();
   } catch (e) {
-    status('Não consegui abrir esse arquivo. Tente um áudio comum (mp3, m4a, wav, ogg).');
+    status(t('hum.fileFailed'));
   }
   render();
 }
@@ -107,11 +108,11 @@ function analyse() {
   if (!H.samples) return;
   H.result = transcribe(H.samples, ANALYSIS_RATE, { prefer: state.modeKey, autoMode: H.auto, rhythm: H.rhythm });
   if (!H.result) {
-    status('Não encontrei uma melodia. Cante mais perto do celular, num lugar quieto, uma nota de cada vez.');
+    status(t('hum.nothing'));
     return;
   }
   const r = H.result, n = r.notes.length;
-  status(`${n} ${n === 1 ? 'nota' : 'notas'} em ${MODES[r.mode].name}${r.shift ? `, ${Math.abs(r.shift)} ${Math.abs(r.shift) === 1 ? 'semitom' : 'semitons'} ${r.shift > 0 ? 'acima' : 'abaixo'} do que foi cantado` : ''}.${r.moved ? ` ${r.moved} ${r.moved === 1 ? 'nota ficava fora das cordas e foi para a mais próxima' : 'notas ficavam fora das cordas e foram para as mais próximas'}.` : ''}`);
+  status(t('hum.result', { n, mode: t('mode.' + r.mode), shift: r.shift, moved: r.moved }));
 }
 
 function listen() {
@@ -153,11 +154,11 @@ function drawRoll() {
 
 function render() {
   const recording = !!H.rec;
-  $('humRec').textContent = recording ? 'Parar' : 'Gravar voz';
+  $('humRec').textContent = recording ? t('hum.stop') : t('hum.record');
   $('humRec').classList.toggle('recording', recording);
   $('humFileBtn').classList.toggle('disabled', recording);
   $('humResult').hidden = !H.result || recording;
-  $('humPlay').textContent = H.stopPlay ? 'Parar' : 'Ouvir';
+  $('humPlay').textContent = H.stopPlay ? t('hum.stop') : t('hum.listen');
   $('humAuto').setAttribute('aria-pressed', H.auto);
   $('humRhythm').setAttribute('aria-pressed', H.rhythm);
   if (H.result && !recording) requestAnimationFrame(drawRoll);
@@ -171,17 +172,17 @@ export function initHum() {
   $('humRhythm').addEventListener('click', () => { H.rhythm = !H.rhythm; stopListening(); analyse(); render(); });
   $('humSave').addEventListener('click', () => {
     if (!H.result) return;
-    const name = addSaved(asRecording(), H.source === 'arquivo' ? 'Do arquivo' : 'Da voz');
-    status(`"${name}" salva em Gravações salvas (dá para renomear lá). Também aparece em Canções, em "Suas gravações".`);
+    const name = addSaved(asRecording(), H.source === 'arquivo' ? t('hum.nameFile') : t('hum.nameVoice'));
+    status(t('hum.savedMsg', { name }));
   });
   $('humToLoop').addEventListener('click', () => {
     if (!H.result) return;
     stopListening();
     loadIntoLooper(asRecording());
-    status('A melodia virou a primeira camada do gravador acima: grave outras camadas por cima.');
+    status(t('hum.toLoopMsg'));
     $('hRec').scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
-  $('humDiscard').addEventListener('click', () => { stopListening(); H.result = null; H.samples = null; status('Cantarole, cante ou assobie uma melodia (até 30 s) e a lira toca de volta.'); render(); });
+  $('humDiscard').addEventListener('click', () => { stopListening(); H.result = null; H.samples = null; status(t('hum.intro')); render(); });
   addEventListener('resize', () => { if (H.result) drawRoll(); });
   addEventListener('themechange', () => { if (H.result) drawRoll(); });
   render();
