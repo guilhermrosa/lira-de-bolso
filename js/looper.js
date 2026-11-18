@@ -118,6 +118,18 @@ function load(rec) {
   render();
 }
 export function saved() { return store.get('loops', []); }
+// From the voice (hum.js, v0.7): keep a recording in the saved list, or make it the loop's first layer.
+export function addSaved(rec, base) {
+  const list = saved();
+  let k = 1; while (list.some(r => r.name === `${base} ${k}`)) k++;
+  const name = `${base} ${k}`;
+  list.unshift({ name, at: new Date().toISOString(), ...rec });
+  store.set('loops', list.slice(0, 30));
+  $('savedBox').open = true;
+  render();
+  return name;
+}
+export function loadIntoLooper(rec) { load(rec); autosave(); }
 
 // Saving asks for a name first (prefilled), then opens the saved list so the result is visible.
 function askName() {

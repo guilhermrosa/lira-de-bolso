@@ -69,6 +69,33 @@
       </details>
     </section>
 
+    <section class="rec hum" aria-labelledby="hHum">
+      <div class="rec-head">
+        <h2 id="hHum">Da sua voz para a lira</h2>
+        <div class="loop-bar level" id="humLevel" aria-hidden="true"><i></i></div>
+      </div>
+      <p class="note" id="humStatus" role="status">Cantarole, cante ou assobie uma melodia (até 30 s) e a lira toca de volta.</p>
+      <div class="btns">
+        <button class="btn primary" type="button" id="humRec">Gravar voz</button>
+        <label class="btn" id="humFileBtn" for="humFile">Abrir áudio</label>
+        <input type="file" id="humFile" accept="audio/*" hidden>
+      </div>
+      <div class="chips hum-opts">
+        <button class="chip" type="button" id="humAuto" aria-pressed="true">Escolher a escala</button>
+        <button class="chip" type="button" id="humRhythm" aria-pressed="true">Ajustar o ritmo</button>
+      </div>
+      <div id="humResult" hidden>
+        <canvas class="roll" id="humRoll" aria-label="A melodia nas cordas da lira"></canvas>
+        <div class="btns">
+          <button class="btn primary" type="button" id="humPlay">Ouvir</button>
+          <button class="btn" type="button" id="humSave">Salvar gravação</button>
+          <button class="btn" type="button" id="humToLoop">Levar para o gravador</button>
+          <button class="btn" type="button" id="humDiscard">Descartar</button>
+        </div>
+      </div>
+      <p class="note small">Funciona melhor com uma voz só, num lugar quieto, uma nota de cada vez. "Abrir áudio" serve para uma gravação de voz ou de um instrumento solo; música com banda ainda não. O som é analisado no próprio aparelho e não é enviado a lugar nenhum.</p>
+    </section>
+
     <div class="grid">
       <section aria-labelledby="hTimbre">
         <h2 id="hTimbre">Timbre</h2>

@@ -3,6 +3,7 @@
 
 import { $, state, audio, applyTimbre, saveSettings, buildStrings, setMode, onModeChange, play, strum, MODES, PRESETS } from './core.js';
 import { initLooper, stopLooper } from './looper.js';
+import { initHum, stopHum } from './hum.js';
 import { initRelax } from './relax.js';
 import { initLearn, stopLearn } from './learn.js';
 import { initSongs, stopSongs, refreshSongs } from './songs.js';
@@ -72,7 +73,7 @@ function showTab(name) {
   if (name !== 'memoria') stopLearn();
   if (name !== 'cancoes') stopSongs();
   else refreshSongs();
-  if (name !== 'tocar') stopLooper();
+  if (name !== 'tocar') { stopLooper(); stopHum(); }
   if (location.hash.slice(1) !== name) history.replaceState(null, '', '#' + name);
 }
 for (const t of TABS) $('tab-' + t).addEventListener('click', () => showTab(t));
@@ -81,6 +82,7 @@ addEventListener('hashchange', () => showTab(location.hash.slice(1)));
 buildStrings();
 syncUI();
 initLooper();
+initHum();
 initRelax();
 initLearn();
 initSongs();

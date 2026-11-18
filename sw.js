@@ -10,6 +10,8 @@ const SHELL = [
   'js/app.js',
   'js/core.js',
   'js/looper.js',
+  'js/hum.js',
+  'js/pitch.js',
   'js/relax.js',
   'js/learn.js',
   'js/songs.js',
