@@ -14,7 +14,7 @@
   <meta name="apple-mobile-web-app-title" content="Lira">
   <link rel="stylesheet" href="css/style.css">
   <script src="js/version.js"></script>
-  <script>try { const t = JSON.parse(localStorage.getItem('lira-theme')); if (t && t !== 'ceramica') document.documentElement.dataset.theme = t; } catch (e) {}</script>
+  <script>try { const t = JSON.parse(localStorage.getItem('lira-theme')); if (t === 'marmore' || t === 'noite') document.documentElement.dataset.theme = t; } catch (e) {}</script>
 </head>
 <body>
 <div class="wrap">
@@ -177,8 +177,9 @@
       <section aria-labelledby="hTheme">
         <h3 class="sub" id="hTheme">Tema</h3>
         <div class="theme-chips" id="themes">
-          <button class="theme-chip" type="button" data-theme="ceramica"><i class="sw-ceramica"></i>Cerâmica</button>
+          <button class="theme-chip" type="button" data-theme="anfora"><i class="sw-anfora"></i>Ânfora</button>
           <button class="theme-chip" type="button" data-theme="marmore"><i class="sw-marmore"></i>Mármore e Egeu</button>
+          <button class="theme-chip" type="button" data-theme="noite"><i class="sw-noite"></i>Noite no templo</button>
         </div>
       </section>
       <div class="btns"><button class="btn primary" value="close">Fechar</button></div>

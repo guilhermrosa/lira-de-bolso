@@ -61,16 +61,16 @@ modesEl.addEventListener('click', e => {
 onModeChange(syncUI);
 
 // ---- settings: theme (v0.8) ----
-const THEME_COLOR = { ceramica: '#d06c42', marmore: '#eff0eb' };
+const THEME_COLOR = { anfora: '#d06c42', marmore: '#eff0eb', noite: '#121829' };
 function applyTheme(t) {
-  if (!THEME_COLOR[t]) t = 'ceramica';
-  if (t === 'ceramica') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = t;
+  if (!THEME_COLOR[t]) t = 'anfora'; // also 'ceramica', its name in v0.8
+  if (t === 'anfora') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = t;
   document.querySelector('meta[name="theme-color"]').setAttribute('content', THEME_COLOR[t]);
   $('themes').querySelectorAll('[data-theme]').forEach(b => b.setAttribute('aria-pressed', b.dataset.theme === t));
   store.set('theme', t);
   dispatchEvent(new Event('themechange'));
 }
-applyTheme(store.get('theme', 'ceramica'));
+applyTheme(store.get('theme', 'anfora'));
 $('themes').addEventListener('click', e => { const b = e.target.closest('[data-theme]'); if (b) applyTheme(b.dataset.theme); });
 $('settingsOpen').addEventListener('click', () => $('settings').showModal());
 

@@ -139,11 +139,11 @@ function drawRoll() {
   ctx.scale(dpr, dpr);
   const css = getComputedStyle(document.documentElement);
   const strings = stringsOf(r.mode), rows = strings.length, rowH = h / rows;
-  ctx.fillStyle = css.getPropertyValue('--black'); ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = css.getPropertyValue('--lyre-bg'); ctx.fillRect(0, 0, w, h); // the lyre's own colours, in any theme
   ctx.strokeStyle = css.getPropertyValue('--clay-deep');
   for (let i = 0; i < rows; i++) { const y = h - (i + 0.5) * rowH; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
   const k = (w - 8) / r.loopLen;
-  ctx.fillStyle = css.getPropertyValue('--cream');
+  ctx.fillStyle = css.getPropertyValue('--lyre-ink');
   r.notes.forEach((n, j) => {
     const i = strings.indexOf(n.midi), next = r.notes[j + 1];
     const len = Math.max(6, ((next ? next.t : r.loopLen - 0.3) - n.t) * k - 3);

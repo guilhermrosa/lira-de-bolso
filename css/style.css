@@ -133,7 +133,7 @@ label.btn.disabled { opacity: .45; pointer-events: none; }
 .foot a { color: var(--black); font-weight: 600; }
 
 /* ---- themes (v0.8) ----
-   Cerâmica: the v0.4 look above (terracotta and black-figure forms).
+   Ânfora: the v0.4 look above (terracotta and black-figure forms; called Cerâmica in v0.8).
    Mármore e Egeu: direction 1 of docs/direcoes-visuais.md, light marble, Aegean blue accents,
    bronze strings in a marble lyre, terracotta for a plucked string and for recording. */
 :root[data-theme="marmore"] {
@@ -158,5 +158,26 @@ label.btn.disabled { opacity: .45; pointer-events: none; }
 .theme-chip { display: grid; gap: 8px; padding: 10px; border-radius: 14px; border: 2px solid var(--black); background: transparent; color: var(--black); font: 600 13.5px/1.2 var(--body); cursor: pointer; text-align: left; }
 .theme-chip[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--accent) inset; }
 .theme-chip i { display: block; height: 46px; border-radius: 10px; }
-.theme-chip .sw-ceramica { background: linear-gradient(90deg, #d06c42 0 45%, #1b1512 45% 80%, #f1dfbd 80%); }
+:root[data-theme="noite"] {
+  --clay: #121829; --clay-deep: #2a3452; --black: #ece6d6; --cream: #121829; --bone: #ffe7ad; --tan: #9aa3b8; --string: #d9b26a;
+  --lyre-bg: #1a2238; --lyre-ink: #f3e6c4; --lyre-sub: #9aa3b8; --lyre-bar: #d9b26a; --lyre-border: 2px solid #2a3452;
+  --string-hot: #ffe7ad; --root: #d9b26a;
+  --accent: #d9b26a; --on-accent: #121829; --field: #1a2238;
+  --rec: #e07a63; --rec-ink: #121829; --focus: #8fb4d8;
+  --meander: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='12' viewBox='0 0 28 12'%3E%3Cpath d='M0 11H10V1H20V8H14V5' fill='none' stroke='%23d9b26a' stroke-width='2'/%3E%3C/svg%3E");
+  color-scheme: dark;
+}
+:root[data-theme="noite"] .meander { border-color: #d9b26a; }
+:root[data-theme="noite"] h1, :root[data-theme="noite"] h2, :root[data-theme="noite"] .sub { color: #f3e6c4; }
+:root[data-theme="noite"] .tabs { background: #1a2238; box-shadow: 0 0 0 2px #2a3452 inset; }
+:root[data-theme="noite"] .tab { color: #ece6d6; }
+:root[data-theme="noite"] .tab[aria-selected="true"] { background: #d9b26a; color: #121829; }
+:root[data-theme="noite"] .chip[aria-pressed="true"] { background: #8fb4d8; border-color: #8fb4d8; color: #121829; }
+:root[data-theme="noite"] .loop-bar i { background: #8fb4d8; }
+:root[data-theme="noite"] .str.on::before, :root[data-theme="noite"] .str.guide::before { box-shadow: 0 0 10px rgba(255, 231, 173, .8); }
+:root[data-theme="noite"] .settings { background: #1a2238; }
+:root[data-theme="noite"] .rec { border-color: #2a3452; background: rgba(26, 34, 56, .55); }
+.theme-chips { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.theme-chip .sw-noite { background: linear-gradient(90deg, #121829 0 45%, #1a2238 45% 65%, #d9b26a 65% 85%, #8fb4d8 85%); border: 1px solid #2a3452; }
+.theme-chip .sw-anfora { background: linear-gradient(90deg, #d06c42 0 45%, #1b1512 45% 80%, #f1dfbd 80%); }
 .theme-chip .sw-marmore { background: linear-gradient(90deg, #eff0eb 0 45%, #2f6c8c 45% 70%, #a8823a 70% 85%, #c4553f 85%); border: 1px solid #d6dad2; }

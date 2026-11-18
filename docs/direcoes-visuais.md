@@ -17,7 +17,7 @@ Clara e serena, da mesma família visual do Corredor Invertido.
 
 Fontes: Marcellus (títulos), Inter (texto). Cordas numa moldura com travessa de bronze e caixa de som em mármore.
 
-## 2 · Cerâmica de figuras negras (em uso)
+## 2 · Cerâmica de figuras negras (tema padrão, "Ânfora")
 
 Inspirada nos vasos gregos: terracota, formas pretas, faixa de grega, a lira como silhueta de vaso.
 
@@ -32,7 +32,7 @@ Inspirada nos vasos gregos: terracota, formas pretas, faixa de grega, a lira com
 
 Fontes: Cinzel (títulos, letras de inscrição), Inter (texto). Abas em pílula preta, botões e chips com contorno preto (preenchidos quando escolhidos), faixa de grega sob o título.
 
-## 3 · Noite no templo
+## 3 · Noite no templo (tema desde a v0.9)
 
 Escura de propósito, com cordas douradas que brilham; combina com o modo relaxar.
 
