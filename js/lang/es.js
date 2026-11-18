@@ -56,7 +56,6 @@ export default {
   'hum.savedMsg': '"{name}" guardada en Grabaciones guardadas (puedes renombrarla allí). También aparece en Canciones, en "Tus grabaciones".',
   'hum.toLoopMsg': 'La melodía es ahora la primera capa de la grabadora de arriba: graba otras capas encima.',
   'hum.nameVoice': 'De la voz', 'hum.nameFile': 'Del archivo',
-  'hum.optsHelp': "Escala automática: la lira elige la escala y la altura en que la melodía cabe mejor en las cuerdas; apagada, usa la escala de \"Tocar\". Ritmo regular: alinea las notas a un pulso constante; apagado, mantiene el tiempo exacto de como se cantó o tocó.",
   'song.approx': "Es una aproximación: escucha para comprobar.",
   'song.nothing': "No encontré una melodía en este fragmento. Prueba otro.",
   'song.failed': "No se pudo analizar este fragmento en este dispositivo.",
