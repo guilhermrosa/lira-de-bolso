@@ -147,8 +147,11 @@ export function quantize(notes) {
 }
 
 // The whole way, from samples to a recording's notes.
-export function transcribe(x, sr, { prefer = 'dorico', autoMode = true, rhythm = true } = {}) {
-  const raw = segment(track(x, sr));
+export function transcribe(x, sr, opts = {}) { return arrange(segment(track(x, sr)), opts); }
+
+// Notes found by any analysis ([{ t, dur, midi, rms }], the voice's or a song's, melody.js) →
+// a recording on the lyre: tuned, fitted to the strings, its rhythm tidied.
+export function arrange(raw, { prefer = 'dorico', autoMode = true, rhythm = true } = {}) {
   if (!raw.length) return null;
   const tuned = tune(raw);
   const fitted = fit(tuned, prefer, autoMode ? undefined : [prefer]);

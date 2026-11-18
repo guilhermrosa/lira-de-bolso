@@ -3,6 +3,9 @@
 // (the browser checks imported scripts for changes too).
 importScripts('js/version.js');
 const VERSION = 'lira-v' + self.APP_VERSION;
+// TensorFlow.js and the Basic Pitch model (vendor/, ~2 MB, only for "Abrir música") are not in the
+// shell: they are cached the first time they are used, in a cache that survives new versions.
+const VENDOR = 'lira-vendor-1';
 const SHELL = [
   './',
   'index.html',
@@ -17,6 +20,8 @@ const SHELL = [
   'js/lang/es.js',
   'js/lang/zh.js',
   'js/pitch.js',
+  'js/melody.js',
+  'js/song-ai.js',
   'js/relax.js',
   'js/learn.js',
   'js/songs.js',
@@ -46,7 +51,7 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== VERSION).map(k => caches.delete(k))))
+      .then(keys => Promise.all(keys.filter(k => k !== VERSION && k !== VENDOR).map(k => caches.delete(k))))
       .then(() => self.clients.claim()),
   );
 });
@@ -60,6 +65,16 @@ self.addEventListener('fetch', event => {
   const sameOrigin = url.origin === self.location.origin;
   if (!sameOrigin) return; // the app talks to no other site
 
+  if (url.pathname.includes('/vendor/')) { // fixed files: the cache first
+    event.respondWith(caches.open(VENDOR).then(async cache => {
+      const hit = await cache.match(req, { ignoreSearch: true });
+      if (hit) return hit;
+      const res = await fetch(req);
+      if (res.ok) cache.put(req, res.clone());
+      return res;
+    }));
+    return;
+  }
   event.respondWith(caches.open(VERSION).then(async cache => {
     const fromCache = () => cache.match(req, { ignoreSearch: true })
       .then(r => r || (req.mode === 'navigate' ? cache.match('index.html') : null));

@@ -1,25 +1,29 @@
 // "Da sua voz para a lira" (v0.7): hum, sing or whistle into the microphone (or open an audio file
 // with one voice) and the lyre plays it back; the result can be saved as a recording or taken into
-// the layered recorder. Everything happens on the device: the sound is analysed here (pitch.js)
-// and never sent anywhere.
+// the layered recorder. v0.11: "Abrir música" takes a song with a band: pick a stretch of up to
+// 30 s, the Basic Pitch model (song-ai.js) hears every note in it and melody.js picks the tune.
+// Everything happens on the device: the sound is analysed here and never sent anywhere.
 
 import { t } from './i18n.js';
 import { $, state, audio, phrase, setMode, MODES } from './core.js';
-import { transcribe, stringsOf, ANALYSIS_RATE } from './pitch.js';
+import { track, segment, arrange, stringsOf, ANALYSIS_RATE } from './pitch.js';
+import { melody } from './melody.js';
+import { loadModel, posteriors, MODEL_RATE } from './song-ai.js';
 import { addSaved, loadIntoLooper } from './looper.js';
 
 const MAX_SECONDS = 30;
-const H = { rec: null, samples: null, result: null, stopPlay: null, auto: true, rhythm: true, source: '' };
+const CLIP = 30; // seconds of a song analysed at once
+const H = { rec: null, raw: null, result: null, stopPlay: null, auto: true, rhythm: true, source: '', song: null, busy: false, preview: null };
 
 const status = text => { $('humStatus').textContent = text; };
 
 // Any audio (a recorded clip or a file) → mono samples at the analysis rate, at most MAX_SECONDS
 // (files: the first 60 s). The browser's own resampler does the work.
-async function toSamples(arrayBuffer, limit) {
+async function toSamples(arrayBuffer, limit, rate = ANALYSIS_RATE) {
   const ac = audio();
   const buf = await ac.decodeAudioData(arrayBuffer);
   const len = Math.min(buf.length, Math.floor(limit * buf.sampleRate));
-  const off = new OfflineAudioContext(1, Math.ceil(len / buf.sampleRate * ANALYSIS_RATE), ANALYSIS_RATE);
+  const off = new OfflineAudioContext(1, Math.ceil(len / buf.sampleRate * rate), rate);
   const src = off.createBufferSource();
   src.buffer = buf;
   src.connect(off.destination);
@@ -41,7 +45,7 @@ async function startMic() {
     status(t('hum.noMic'));
     return;
   }
-  stopListening();
+  stopListening(); stopPreview(); H.song = null;
   const rec = new MediaRecorder(stream);
   const chunks = [];
   rec.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
@@ -69,7 +73,7 @@ async function startMic() {
     status(t('hum.analysing'));
     try {
       const blob = new Blob(chunks, { type: rec.mimeType || 'audio/webm' });
-      H.samples = await toSamples(await blob.arrayBuffer(), MAX_SECONDS);
+      H.raw = segment(track(await toSamples(await blob.arrayBuffer(), MAX_SECONDS), ANALYSIS_RATE));
       H.source = 'voz';
       analyse();
     } catch (e) { status(t('hum.readFailed')); }
@@ -91,10 +95,10 @@ function stopMic() {
 // ---- file ----
 async function openFile(file) {
   if (!file) return;
-  stopListening();
+  stopListening(); stopPreview(); H.song = null;
   status(t('hum.analysing'));
   try {
-    H.samples = await toSamples(await file.arrayBuffer(), 60);
+    H.raw = segment(track(await toSamples(await file.arrayBuffer(), 60), ANALYSIS_RATE));
     H.source = 'arquivo';
     analyse();
   } catch (e) {
@@ -103,16 +107,85 @@ async function openFile(file) {
   render();
 }
 
+// ---- a song with a band ----
+const clock = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+function clipRange() {
+  const len = H.song.x.length / MODEL_RATE, from = Math.min(+$('songStart').value, Math.max(0, len - 1));
+  return { from, to: Math.min(len, from + CLIP) };
+}
+function showClip() {
+  const { from, to } = clipRange();
+  $('songClipInfo').textContent = t('song.clip', { from: clock(from), to: clock(to) });
+}
+async function openSong(file) {
+  if (!file) return;
+  stopListening(); stopPreview();
+  status(t('song.reading'));
+  H.busy = true; render();
+  try {
+    const x = await toSamples(await file.arrayBuffer(), 20 * 60, MODEL_RATE); // whole song, mono
+    H.song = { x };
+    const len = x.length / MODEL_RATE;
+    $('songStart').max = Math.max(0, Math.floor(len - CLIP));
+    $('songStart').value = 0;
+    showClip();
+    status(t('song.pick'));
+    loadModel().catch(() => {}); // start fetching the model while a stretch is chosen
+  } catch (e) {
+    H.song = null;
+    status(t('hum.fileFailed'));
+  }
+  H.busy = false; render();
+}
+function preview() {
+  if (H.preview) { stopPreview(); return; }
+  const ac = audio(), { from, to } = clipRange();
+  const buf = ac.createBuffer(1, H.song.x.length, MODEL_RATE);
+  buf.getChannelData(0).set(H.song.x);
+  const src = ac.createBufferSource(), g = ac.createGain();
+  g.gain.value = 0.8;
+  src.buffer = buf; src.connect(g).connect(ac.destination);
+  src.onended = () => { if (H.preview === src) { H.preview = null; render(); } };
+  src.start(0, from, to - from);
+  H.preview = src; render();
+}
+function stopPreview() { if (H.preview) { const p = H.preview; H.preview = null; try { p.stop(); } catch (e) { /* ended */ } render(); } }
+async function extract() {
+  if (!H.song || H.busy) return;
+  stopPreview(); stopListening();
+  H.busy = true; render();
+  const { from, to } = clipRange();
+  const x = H.song.x.subarray(Math.floor(from * MODEL_RATE), Math.floor(to * MODEL_RATE));
+  try {
+    status(t('song.loading'));
+    await loadModel();
+  } catch (e) {
+    status(t('song.loadFailed'));
+    H.busy = false; render(); return;
+  }
+  try {
+    const p = await posteriors(x, f => { status(t('song.listening', { p: Math.round(f * 100) })); $('humLevel').style.setProperty('--p', f.toFixed(3)); });
+    $('humLevel').style.setProperty('--p', 0);
+    H.raw = melody(p.frames, p.onsets);
+    H.source = 'musica';
+    H.song = null;
+    analyse();
+  } catch (e) {
+    status(t('song.failed'));
+  }
+  H.busy = false; render();
+}
+
 // ---- analysis ----
 function analyse() {
-  if (!H.samples) return;
-  H.result = transcribe(H.samples, ANALYSIS_RATE, { prefer: state.modeKey, autoMode: H.auto, rhythm: H.rhythm });
+  if (!H.raw) return;
+  H.result = arrange(H.raw, { prefer: state.modeKey, autoMode: H.auto, rhythm: H.rhythm });
   if (!H.result) {
-    status(t('hum.nothing'));
+    status(t(H.source === 'musica' ? 'song.nothing' : 'hum.nothing'));
     return;
   }
   const r = H.result, n = r.notes.length;
-  status(t('hum.result', { n, mode: t('mode.' + r.mode), shift: r.shift, moved: r.moved }));
+  status(t('hum.result', { n, mode: t('mode.' + r.mode), shift: r.shift, moved: r.moved }) + (H.source === 'musica' ? ' ' + t('song.approx') : ''));
 }
 
 function listen() {
@@ -156,8 +229,13 @@ function render() {
   const recording = !!H.rec;
   $('humRec').textContent = recording ? t('hum.stop') : t('hum.record');
   $('humRec').classList.toggle('recording', recording);
-  $('humFileBtn').classList.toggle('disabled', recording);
-  $('humResult').hidden = !H.result || recording;
+  $('humRec').disabled = H.busy;
+  $('humFileBtn').classList.toggle('disabled', recording || H.busy);
+  $('songFileBtn').classList.toggle('disabled', recording || H.busy);
+  $('songClip').hidden = !H.song || recording;
+  $('songGo').disabled = $('songPreview').disabled = $('songStart').disabled = H.busy;
+  $('songPreview').textContent = H.preview ? t('hum.stop') : t('song.preview');
+  $('humResult').hidden = !H.result || recording || !!H.song;
   $('humPlay').textContent = H.stopPlay ? t('hum.stop') : t('hum.listen');
   $('humAuto').setAttribute('aria-pressed', H.auto);
   $('humRhythm').setAttribute('aria-pressed', H.rhythm);
@@ -172,7 +250,7 @@ export function initHum() {
   $('humRhythm').addEventListener('click', () => { H.rhythm = !H.rhythm; stopListening(); analyse(); render(); });
   $('humSave').addEventListener('click', () => {
     if (!H.result) return;
-    const name = addSaved(asRecording(), H.source === 'arquivo' ? t('hum.nameFile') : t('hum.nameVoice'));
+    const name = addSaved(asRecording(), t({ arquivo: 'hum.nameFile', musica: 'hum.nameSong' }[H.source] || 'hum.nameVoice'));
     status(t('hum.savedMsg', { name }));
   });
   $('humToLoop').addEventListener('click', () => {
@@ -182,9 +260,14 @@ export function initHum() {
     status(t('hum.toLoopMsg'));
     $('hRec').scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
-  $('humDiscard').addEventListener('click', () => { stopListening(); H.result = null; H.samples = null; status(t('hum.intro')); render(); });
+  $('humDiscard').addEventListener('click', () => { stopListening(); H.result = null; H.raw = null; status(t('hum.intro')); render(); });
+  $('songFile').addEventListener('change', e => { openSong(e.target.files[0]); e.target.value = ''; });
+  $('songStart').addEventListener('input', () => { stopPreview(); showClip(); });
+  $('songPreview').addEventListener('click', preview);
+  $('songGo').addEventListener('click', extract);
+  $('songCancel').addEventListener('click', () => { stopPreview(); H.song = null; status(H.result ? '' : t('hum.intro')); render(); if (H.result) analyse(); });
   addEventListener('resize', () => { if (H.result) drawRoll(); });
   addEventListener('themechange', () => { if (H.result) drawRoll(); });
   render();
 }
-export function stopHum() { stopMic(); stopListening(); }
+export function stopHum() { stopMic(); stopListening(); stopPreview(); }

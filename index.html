@@ -75,14 +75,25 @@
 
     <section class="rec hum" aria-labelledby="hHum">
       <div class="rec-head">
-        <h2 id="hHum" data-i18n="hum.title">Da sua voz para a lira</h2>
+        <h2 id="hHum" data-i18n="hum.title">Da sua voz ou música para a lira</h2>
         <div class="loop-bar level" id="humLevel" aria-hidden="true"><i></i></div>
       </div>
-      <p class="note" id="humStatus" role="status" data-i18n="hum.intro">Cantarole, cante ou assobie uma melodia (até 30 s) e a lira toca de volta.</p>
+      <p class="note" id="humStatus" role="status" data-i18n="hum.intro">Cantarole, cante ou assobie uma melodia (até 30 s), ou abra uma música e escolha um trecho: a lira toca a melodia de volta.</p>
       <div class="btns">
         <button class="btn primary" type="button" id="humRec">Gravar voz</button>
         <label class="btn" id="humFileBtn" for="humFile" data-i18n="hum.open">Abrir áudio</label>
         <input type="file" id="humFile" accept="audio/*" hidden>
+        <label class="btn" id="songFileBtn" for="songFile" data-i18n="song.open">Abrir música</label>
+        <input type="file" id="songFile" accept="audio/*" hidden>
+      </div>
+      <div class="song-clip" id="songClip" hidden>
+        <p class="note small" id="songClipInfo"></p>
+        <input type="range" id="songStart" min="0" max="0" step="1" value="0" data-i18n-aria="song.startAria" aria-label="Início do trecho">
+        <div class="btns">
+          <button class="btn primary" type="button" id="songGo" data-i18n="song.go">Tirar a melodia</button>
+          <button class="btn" type="button" id="songPreview" data-i18n="song.preview">Ouvir trecho</button>
+          <button class="btn" type="button" id="songCancel" data-i18n="rec.cancel">Cancelar</button>
+        </div>
       </div>
       <div class="chips hum-opts">
         <button class="chip" type="button" id="humAuto" aria-pressed="true" data-i18n="hum.auto">Escolher a escala</button>
@@ -97,7 +108,7 @@
           <button class="btn" type="button" id="humDiscard" data-i18n="hum.discard">Descartar</button>
         </div>
       </div>
-      <p class="note small" data-i18n="hum.tip">Funciona melhor com uma voz só, num lugar quieto, uma nota de cada vez. "Abrir áudio" serve para uma gravação de voz ou de um instrumento solo; música com banda ainda não. O som é analisado no próprio aparelho e não é enviado a lugar nenhum.</p>
+      <p class="note small" data-i18n="hum.tip">Com a voz, funciona melhor num lugar quieto, uma nota de cada vez. "Abrir áudio" é para uma voz ou um instrumento solo; "Abrir música" tira a melodia de uma música com banda, de forma aproximada (confira ouvindo). Tudo é analisado no próprio aparelho e nada é enviado a lugar nenhum.</p>
     </section>
 
     <div class="grid">
