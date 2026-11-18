@@ -2,7 +2,7 @@
 
 Três identidades foram desenhadas em 11/11/2026 e comparadas lado a lado na página de modelos (canvas "Lira de Bolso — direções visuais", no Claude). A **2 · Cerâmica de figuras negras** foi escolhida e aplicada na versão 0.4. As outras duas ficam guardadas aqui para uso futuro, por exemplo como temas alternativos.
 
-## 1 · Mármore e Egeu
+## 1 · Mármore e Egeu (tema desde a v0.8)
 
 Clara e serena, da mesma família visual do Corredor Invertido.
 

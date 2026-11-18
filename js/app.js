@@ -1,7 +1,7 @@
 // Lira de Bolso: entry point. Tabs (Tocar, Relaxar, Memória, Canções), timbre and scale
 // controls, and offline support. The strings and audio live in core.js.
 
-import { $, state, audio, applyTimbre, saveSettings, buildStrings, setMode, onModeChange, play, strum, MODES, PRESETS } from './core.js';
+import { $, store, state, audio, applyTimbre, saveSettings, buildStrings, setMode, onModeChange, play, strum, MODES, PRESETS } from './core.js';
 import { initLooper, stopLooper } from './looper.js';
 import { initHum, stopHum } from './hum.js';
 import { initRelax } from './relax.js';
@@ -59,6 +59,20 @@ modesEl.addEventListener('click', e => {
   strum(state.notes.slice(0, MODES[state.modeKey].steps.length + 1), 90, 0.45);
 });
 onModeChange(syncUI);
+
+// ---- settings: theme (v0.8) ----
+const THEME_COLOR = { ceramica: '#d06c42', marmore: '#eff0eb' };
+function applyTheme(t) {
+  if (!THEME_COLOR[t]) t = 'ceramica';
+  if (t === 'ceramica') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = t;
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', THEME_COLOR[t]);
+  $('themes').querySelectorAll('[data-theme]').forEach(b => b.setAttribute('aria-pressed', b.dataset.theme === t));
+  store.set('theme', t);
+  dispatchEvent(new Event('themechange'));
+}
+applyTheme(store.get('theme', 'ceramica'));
+$('themes').addEventListener('click', e => { const b = e.target.closest('[data-theme]'); if (b) applyTheme(b.dataset.theme); });
+$('settingsOpen').addEventListener('click', () => $('settings').showModal());
 
 // ---- tabs ----
 const TABS = ['tocar', 'relaxar', 'memoria', 'cancoes'];

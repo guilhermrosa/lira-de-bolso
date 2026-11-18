@@ -183,6 +183,7 @@ export function initHum() {
   });
   $('humDiscard').addEventListener('click', () => { stopListening(); H.result = null; H.samples = null; status('Cantarole, cante ou assobie uma melodia (até 30 s) e a lira toca de volta.'); render(); });
   addEventListener('resize', () => { if (H.result) drawRoll(); });
+  addEventListener('themechange', () => { if (H.result) drawRoll(); });
   render();
 }
 export function stopHum() { stopMic(); stopListening(); }
