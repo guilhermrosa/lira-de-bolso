@@ -100,7 +100,18 @@
         <button class="chip" type="button" id="humRhythm" aria-pressed="true" data-i18n="hum.rhythm">Ritmo regular</button>
       </div>
       <div id="humResult" hidden>
-        <canvas class="roll" id="humRoll" data-i18n-aria="hum.rollAria" aria-label="A melodia nas cordas da lira"></canvas>
+        <div class="roll-wrap" id="humRollWrap"><canvas class="roll" id="humRoll" data-i18n-aria="hum.rollAria" aria-label="A melodia nas cordas da lira"></canvas></div>
+        <div class="edit-bar">
+          <span class="edit-info" id="editInfo" aria-live="polite"></span>
+          <div class="edit-btns">
+            <button class="btn icon" type="button" id="editUp" data-i18n-aria="edit.up" aria-label="Corda acima">▲</button>
+            <button class="btn icon" type="button" id="editDown" data-i18n-aria="edit.down" aria-label="Corda abaixo">▼</button>
+            <button class="btn icon" type="button" id="editLeft" data-i18n-aria="edit.left" aria-label="Mais cedo">◀</button>
+            <button class="btn icon" type="button" id="editRight" data-i18n-aria="edit.right" aria-label="Mais tarde">▶</button>
+            <button class="btn" type="button" id="editDelete" data-i18n="edit.delete">Apagar</button>
+            <button class="btn" type="button" id="editUndo" data-i18n="edit.undo">Desfazer</button>
+          </div>
+        </div>
         <div class="btns">
           <button class="btn primary" type="button" id="humPlay">Ouvir</button>
           <button class="btn" type="button" id="humSave" data-i18n="hum.save">Salvar gravação</button>

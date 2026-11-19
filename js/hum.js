@@ -4,8 +4,8 @@
 // 30 s, the Basic Pitch model (song-ai.js) hears every note in it and melody.js picks the tune.
 // Everything happens on the device: the sound is analysed here and never sent anywhere.
 
-import { t } from './i18n.js';
-import { $, state, audio, phrase, setMode, MODES } from './core.js';
+import { t, noteName } from './i18n.js';
+import { $, state, audio, play, phrase, setMode, MODES } from './core.js';
 import { track, segment, arrange, stringsOf, ANALYSIS_RATE } from './pitch.js';
 import { melody } from './melody.js';
 import { loadModel, posteriors, MODEL_RATE } from './song-ai.js';
@@ -13,7 +13,8 @@ import { addSaved, loadIntoLooper } from './looper.js';
 
 const MAX_SECONDS = 30;
 const CLIP = 30; // seconds of a song analysed at once
-const H = { rec: null, raw: null, result: null, stopPlay: null, auto: true, rhythm: true, source: '', song: null, busy: false, preview: null };
+const H = { rec: null, raw: null, result: null, stopPlay: null, auto: true, rhythm: true, source: '', song: null, busy: false, preview: null, sel: -1, undo: [], at: -1 };
+const PPS = 70; // roll pixels per second: wide enough to tap a note, the roll scrolls sideways
 
 const status = text => { $('humStatus').textContent = text; };
 
@@ -177,25 +178,91 @@ async function extract() {
 }
 
 // ---- analysis ----
-function analyse() {
+// keep = true when an option is switched on a result: the result before it can be undone
+function analyse(keep = false) {
   if (!H.raw) return;
+  if (keep && H.result) H.undo.push(snapshot()); else H.undo = [];
+  H.sel = -1;
   H.result = arrange(H.raw, { prefer: state.modeKey, autoMode: H.auto, rhythm: H.rhythm });
   if (!H.result) {
     status(t(H.source === 'musica' ? 'song.nothing' : 'hum.nothing'));
     return;
   }
+  summary();
+}
+function summary() {
   const r = H.result, n = r.notes.length;
   status(t('hum.result', { n, mode: t('mode.' + r.mode), shift: r.shift, moved: r.moved }) + (H.source === 'musica' ? ' ' + t('song.approx') : ''));
+}
+
+// ---- editing (v0.12, step 3): tap a note to pick it, then move it a string up or down, earlier
+// or later, or delete it; tap an empty spot to put a note there. Every change can be undone.
+const snapshot = () => JSON.parse(JSON.stringify(H.result));
+const step = () => H.result.grid || 0.05; // moves follow the rhythm's grid when there is one
+function edited(fn) {
+  H.undo.push(snapshot());
+  if (H.undo.length > 60) H.undo.shift();
+  const r = H.result, picked = r.notes[H.sel];
+  fn(r);
+  r.notes.sort((a, b) => a.t - b.t || a.midi - b.midi);
+  H.sel = picked ? r.notes.indexOf(picked) : H.sel;
+  const last = r.notes.length ? r.notes[r.notes.length - 1].t : 0;
+  r.loopLen = +Math.max(r.loopLen, last + Math.max(0.8, (r.grid || 0) * 2)).toFixed(3);
+  if (H.sel >= 0) play(r.notes[H.sel].midi, 0, 0.55);
+  render();
+}
+function pick(i) { H.sel = i; if (i >= 0) play(H.result.notes[i].midi, 0, 0.55); render(); }
+function moveString(d) {
+  if (H.sel < 0) return;
+  const strings = stringsOf(H.result.mode);
+  edited(r => { const n = r.notes[H.sel], i = strings.indexOf(n.midi); n.midi = strings[Math.max(0, Math.min(strings.length - 1, i + d))]; });
+}
+function moveTime(d) {
+  if (H.sel < 0) return;
+  edited(r => { const n = r.notes[H.sel]; n.t = +Math.max(0, n.t + d * step()).toFixed(3); });
+}
+function remove() {
+  if (H.sel < 0) return;
+  edited(r => { r.notes.splice(H.sel, 1); H.sel = -1; });
+}
+function undo() {
+  if (!H.undo.length) return;
+  stopListening();
+  H.result = H.undo.pop();
+  H.sel = -1;
+  summary(); render();
+}
+// a tap on the roll: the note under the finger, or a new note on that string at that time
+function tapRoll(e) {
+  const r = H.result;
+  if (!r || H.stopPlay) return;
+  const cv = $('humRoll'), box = cv.getBoundingClientRect();
+  const x = e.clientX - box.left, y = e.clientY - box.top;
+  const strings = stringsOf(r.mode), rowH = box.height / strings.length;
+  const row = Math.max(0, Math.min(strings.length - 1, Math.floor((box.height - y) / rowH)));
+  const hit = rects().findIndex(q => x >= q.x - 6 && x <= q.x + q.w + 6 && y >= q.y - 4 && y <= q.y + q.h + 4);
+  if (hit >= 0) { pick(hit === H.sel ? -1 : hit); return; }
+  if (H.sel >= 0) { pick(-1); return; } // a tap beside the picked note lets it go
+  const g = step(), at = Math.max(0, Math.round(((x - 4) / PPS) / g) * g);
+  const note = { t: +at.toFixed(3), midi: strings[row], vel: 0.5 };
+  edited(r2 => { r2.notes.push(note); H.sel = -1; });
+  H.sel = r.notes.indexOf(note); play(note.midi, 0, 0.55); render();
 }
 
 function listen() {
   if (!H.result) return;
   if (H.stopPlay) { stopListening(); return; }
   setMode(H.result.mode);
-  H.stopPlay = phrase(H.result.notes.map(n => ({ t: n.t, midi: n.midi, vel: n.vel })), () => { H.stopPlay = null; render(); });
+  H.sel = -1;
+  H.stopPlay = phrase(H.result.notes.map((n, i) => ({ t: n.t, midi: n.midi, vel: n.vel, onStart: () => { H.at = i; drawRoll(); follow(n); } })), () => { H.stopPlay = null; H.at = -1; render(); });
   render();
 }
-function stopListening() { if (H.stopPlay) { H.stopPlay(); H.stopPlay = null; render(); } }
+function stopListening() { if (H.stopPlay) { H.stopPlay(); H.stopPlay = null; H.at = -1; render(); } }
+// keep the note that sounds in view while listening
+function follow(n) {
+  const wrap = $('humRollWrap'), x = 4 + n.t * PPS;
+  if (x < wrap.scrollLeft + 20 || x > wrap.scrollLeft + wrap.clientWidth - 40) wrap.scrollLeft = Math.max(0, x - 40);
+}
 
 const asRecording = () => ({
   loopLen: H.result.loopLen,
@@ -204,9 +271,22 @@ const asRecording = () => ({
 });
 
 // ---- drawing: the melody on the lyre's strings, a row per string, low at the bottom ----
+// where each note is drawn (also what a tap hits): until the next note, at most 0.6 s
+function rects() {
+  const r = H.result, cv = $('humRoll'), h = cv.clientHeight;
+  const strings = stringsOf(r.mode), rowH = h / strings.length;
+  return r.notes.map((n, j) => {
+    const next = r.notes.slice(j + 1).find(m => m.t > n.t);
+    const len = Math.max(8, Math.min(0.6, (next ? next.t : r.loopLen) - n.t) * PPS - 3);
+    const i = strings.indexOf(n.midi);
+    return { x: 4 + n.t * PPS, y: h - (i + 1) * rowH + 2, w: len, h: Math.max(3, rowH - 4) };
+  });
+}
 function drawRoll() {
   const cv = $('humRoll'), r = H.result;
   if (!r) return;
+  const wrap = $('humRollWrap');
+  cv.style.width = Math.max(wrap.clientWidth, Math.ceil(r.loopLen * PPS + 12)) + 'px';
   const dpr = devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight;
   cv.width = w * dpr; cv.height = h * dpr;
   const ctx = cv.getContext('2d');
@@ -216,12 +296,14 @@ function drawRoll() {
   ctx.fillStyle = css.getPropertyValue('--lyre-bg'); ctx.fillRect(0, 0, w, h); // the lyre's own colours, in any theme
   ctx.strokeStyle = css.getPropertyValue('--clay-deep');
   for (let i = 0; i < rows; i++) { const y = h - (i + 0.5) * rowH; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
-  const k = (w - 8) / r.loopLen;
-  ctx.fillStyle = css.getPropertyValue('--lyre-ink');
-  r.notes.forEach((n, j) => {
-    const i = strings.indexOf(n.midi), next = r.notes[j + 1];
-    const len = Math.max(6, ((next ? next.t : r.loopLen - 0.3) - n.t) * k - 3);
-    ctx.fillRect(4 + n.t * k, h - (i + 1) * rowH + 2, len, Math.max(3, rowH - 4));
+  // a faint mark every second
+  ctx.fillStyle = css.getPropertyValue('--clay-deep');
+  for (let s = 1; s * PPS < w; s++) ctx.fillRect(4 + s * PPS, 0, 1, 4);
+  const ink = css.getPropertyValue('--lyre-ink'), hot = css.getPropertyValue('--string-hot');
+  rects().forEach((q, j) => {
+    ctx.fillStyle = j === H.sel || j === H.at ? hot : ink;
+    ctx.fillRect(q.x, q.y, q.w, q.h);
+    if (j === H.sel) { ctx.strokeStyle = ink; ctx.lineWidth = 2; ctx.strokeRect(q.x - 2, q.y - 2, q.w + 4, q.h + 4); }
   });
 }
 
@@ -239,6 +321,10 @@ function render() {
   $('humPlay').textContent = H.stopPlay ? t('hum.stop') : t('hum.listen');
   $('humAuto').setAttribute('aria-pressed', H.auto);
   $('humRhythm').setAttribute('aria-pressed', H.rhythm);
+  const n = H.result && H.sel >= 0 ? H.result.notes[H.sel] : null;
+  ['editUp', 'editDown', 'editLeft', 'editRight', 'editDelete'].forEach(id => { $(id).disabled = !n || !!H.stopPlay; });
+  $('editUndo').disabled = !H.undo.length || !!H.stopPlay;
+  $('editInfo').textContent = n ? `${noteName(n.midi)}${Math.floor(n.midi / 12) - 1} · ${n.t.toFixed(2).replace('.', t('edit.decimal'))} s` : t('edit.hint');
   if (H.result && !recording) requestAnimationFrame(drawRoll);
 }
 
@@ -246,8 +332,15 @@ export function initHum() {
   $('humRec').addEventListener('click', () => (H.rec ? stopMic() : startMic()));
   $('humFile').addEventListener('change', e => { openFile(e.target.files[0]); e.target.value = ''; });
   $('humPlay').addEventListener('click', listen);
-  $('humAuto').addEventListener('click', () => { H.auto = !H.auto; stopListening(); analyse(); render(); });
-  $('humRhythm').addEventListener('click', () => { H.rhythm = !H.rhythm; stopListening(); analyse(); render(); });
+  $('humAuto').addEventListener('click', () => { H.auto = !H.auto; stopListening(); analyse(true); render(); });
+  $('humRhythm').addEventListener('click', () => { H.rhythm = !H.rhythm; stopListening(); analyse(true); render(); });
+  $('humRoll').addEventListener('click', tapRoll);
+  $('editUp').addEventListener('click', () => moveString(1));
+  $('editDown').addEventListener('click', () => moveString(-1));
+  $('editLeft').addEventListener('click', () => moveTime(-1));
+  $('editRight').addEventListener('click', () => moveTime(1));
+  $('editDelete').addEventListener('click', remove);
+  $('editUndo').addEventListener('click', undo);
   $('humSave').addEventListener('click', () => {
     if (!H.result) return;
     const name = addSaved(asRecording(), t({ arquivo: 'hum.nameFile', musica: 'hum.nameSong' }[H.source] || 'hum.nameVoice'));
@@ -260,12 +353,12 @@ export function initHum() {
     status(t('hum.toLoopMsg'));
     $('hRec').scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
-  $('humDiscard').addEventListener('click', () => { stopListening(); H.result = null; H.raw = null; status(t('hum.intro')); render(); });
+  $('humDiscard').addEventListener('click', () => { stopListening(); H.result = null; H.raw = null; H.undo = []; H.sel = -1; status(t('hum.intro')); render(); });
   $('songFile').addEventListener('change', e => { openSong(e.target.files[0]); e.target.value = ''; });
   $('songStart').addEventListener('input', () => { stopPreview(); showClip(); });
   $('songPreview').addEventListener('click', preview);
   $('songGo').addEventListener('click', extract);
-  $('songCancel').addEventListener('click', () => { stopPreview(); H.song = null; status(H.result ? '' : t('hum.intro')); render(); if (H.result) analyse(); });
+  $('songCancel').addEventListener('click', () => { stopPreview(); H.song = null; if (H.result) summary(); else status(t('hum.intro')); render(); });
   addEventListener('resize', () => { if (H.result) drawRoll(); });
   addEventListener('themechange', () => { if (H.result) drawRoll(); });
   render();
